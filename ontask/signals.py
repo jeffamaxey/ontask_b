@@ -46,7 +46,7 @@ def create_scheduled_task(sender, **kwargs):
     """Create the task in django_celery_beat for every scheduled operation."""
     del sender
     instance = kwargs.get('instance')
-    if not instance or not instance.status == models.scheduler.STATUS_PENDING:
+    if not instance or instance.status != models.scheduler.STATUS_PENDING:
         return
     services.schedule_task(instance)
 
@@ -55,8 +55,7 @@ def create_scheduled_task(sender, **kwargs):
 def delete_scheduled_task(sender, **kwargs):
     """Delete the task attached to a Scheduled Operation."""
     del sender
-    instance = kwargs.get('instance')
-    if not instance:
+    if instance := kwargs.get('instance'):
+        instance.delete_task()
+    else:
         return
-
-    instance.delete_task()

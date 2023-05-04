@@ -134,7 +134,7 @@ class ToolConfig:
                 # Parse custom tags
                 for custom_child in child.getchildren():
                     self.custom_params[custom_child.attrib['name']] =\
-                        custom_child.text
+                            custom_child.text
 
             if 'extensions' in child.tag:
                 platform = child.attrib['platform']
@@ -146,10 +146,10 @@ class ToolConfig:
                         properties[ext_child.attrib['name']] = ext_child.text
                     elif 'options' in ext_child.tag:
                         opt_name = ext_child.attrib['name']
-                        options = {}
-                        for option_child in ext_child.getchildren():
-                            options[option_child.attrib['name']] =\
-                                option_child.text
+                        options = {
+                            option_child.attrib['name']: option_child.text
+                            for option_child in ext_child.getchildren()
+                        }
                         properties[opt_name] = options
 
                 self.set_ext_params(platform, properties)
@@ -177,15 +177,17 @@ class ToolConfig:
             option.text = getattr(self, key)
 
         vendor_keys = ['name', 'code', 'description', 'url']
-        if any('vendor_' + key for key in vendor_keys) or\
-                self.vendor_contact_email:
+        if (
+            any(f'vendor_{key}' for key in vendor_keys)
+            or self.vendor_contact_email
+        ):
             vendor_node = etree.SubElement(root, '{%s}%s'
                                            % (NSMAP['blti'], 'vendor'))
             for key in vendor_keys:
-                if getattr(self, 'vendor_' + key) != None:
+                if getattr(self, f'vendor_{key}') != None:
                     v_node = etree.SubElement(vendor_node,
                                               '{%s}%s' % (NSMAP['lticp'], key))
-                    v_node.text = getattr(self, 'vendor_' + key)
+                    v_node.text = getattr(self, f'vendor_{key}')
             if getattr(self, 'vendor_contact_email'):
                 v_node = etree.SubElement(vendor_node,
                                           '{%s}%s' % (NSMAP['lticp'], 'contact'))
@@ -234,4 +236,4 @@ class ToolConfig:
             identifierref = etree.SubElement(root, 'cartridge_icon',
                                              identifierref=self.cartridge_icon)
 
-        return '<?xml version="1.0" encoding="UTF-8"?>' + etree.tostring(root)
+        return f'<?xml version="1.0" encoding="UTF-8"?>{etree.tostring(root)}'

@@ -79,9 +79,7 @@ def save_condition_form(
         name__in=formula.get_variables(condition.formula),
     ))
 
-    # If the request has the 'action_content' field, update the action
-    action_content = request.POST.get('action_content')
-    if action_content:
+    if action_content := request.POST.get('action_content'):
         action.set_text_content(action_content)
 
     _propagate_changes(condition, form.changed_data, form.old_name, is_new)

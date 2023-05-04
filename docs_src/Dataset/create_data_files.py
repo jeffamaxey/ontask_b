@@ -222,10 +222,7 @@ def create_midterm_data(all_students):
     :return: dictionary with the midterm answers
     """
     midterm_choices = ['A', 'B', 'C', 'D']
-    midterm_solution = []
-    for _ in range(0, 10):
-        midterm_solution.append(random.choice(midterm_choices))
-
+    midterm_solution = [random.choice(midterm_choices) for _ in range(0, 10)]
     # Insert the solution row
     midterm_answers = pd.DataFrame(
         [[0, '', 'SOLUTION', 'SOLUTION'] + midterm_solution + ['100']],
@@ -233,7 +230,6 @@ def create_midterm_data(all_students):
 
     for idx, student_info in all_students.iterrows():
 
-        midterm_score = {}
         # Detect if a student has to be dropped
         skip = False
         for enrolment, rate in midterm_dropout_rates:
@@ -244,25 +240,22 @@ def create_midterm_data(all_students):
         if skip:
             continue
 
-        midterm_score['SID'] = student_info['SID']
-        midterm_score['email'] = student_info['email']
-        midterm_score['Last Name'] = student_info['Surname']
-        midterm_score['First Name'] = student_info['GivenName']
-
         # Select the score based on the program
         prg = student_info['Program']
         score = int(round(random.normalvariate(
             midterm_score_average[prg][0] / 10,
             midterm_score_average[prg][1] / 10)))
-        if score > 10:
-            score = 10
-        if score < 0:
-            score = 0
-
+        score = min(score, 10)
+        score = max(score, 0)
         # Score contains the number of questions that are correct
         text_score = str(10 * score)
-        midterm_score['Total'] = text_score
-
+        midterm_score = {
+            'SID': student_info['SID'],
+            'email': student_info['email'],
+            'Last Name': student_info['Surname'],
+            'First Name': student_info['GivenName'],
+            'Total': text_score,
+        }
         # Add the score also to the all_student database for further reference
         student_info['MIDTERM_SCORE'] = text_score
 
@@ -338,22 +331,19 @@ def create_forum_data(all_students):
                 days_online = \
                     int(round(random.normalvariate(midterm_score * 7 / 10,
                                                    10 - week_n)))
-            if days_online > 7:
-                days_online = 7
-            if days_online < 0:
-                days_online = 0
-
+            days_online = min(days_online, 7)
+            days_online = max(days_online, 0)
             # Insert the value in the student forum data
-            forum_student_data['Days online ' + str(week_n)] = days_online
+            forum_student_data[f'Days online {str(week_n)}'] = days_online
 
             # Accumulate for the final field
             days_online_acc += days_online
 
             if days_online == 0:
                 # If days online is zero, there is nothing else to do!
-                forum_student_data['Views ' + str(week_n)] = 0
-                forum_student_data['Contributions ' + str(week_n)] = 0
-                forum_student_data['Questions ' + str(week_n)] = 0
+                forum_student_data[f'Views {str(week_n)}'] = 0
+                forum_student_data[f'Contributions {str(week_n)}'] = 0
+                forum_student_data[f'Questions {str(week_n)}'] = 0
                 continue
 
             # Number of maximum items for this week
@@ -374,13 +364,10 @@ def create_forum_data(all_students):
                 contr = int(round(random.normalvariate(4, 0.5)))
             else:
                 contr = int(round(random.normalvariate(1, 0.5)))
-            if contr > max_items:
-                contr = max_items
-            if contr < 0:
-                contr = 0
-
+            contr = min(contr, max_items)
+            contr = max(contr, 0)
             # Insert the value in the student forum data
-            forum_student_data['Contributions ' + str(week_n)] = contr
+            forum_student_data[f'Contributions {str(week_n)}'] = contr
 
             # Accumulate for the final field
             contributions_acc += contr
@@ -397,13 +384,11 @@ def create_forum_data(all_students):
                     answers = random.randint(0, contr)
                 else:
                     answers = random.randint(0, 1)
-                if answers > contr:
-                    answers = contr
-
+                answers = min(answers, contr)
                 questions = contr - answers
 
             # Insert the value in the student forum data
-            forum_student_data['Questions ' + str(week_n)] = questions
+            forum_student_data[f'Questions {str(week_n)}'] = questions
 
             # Accumulate for the final field
             questions_acc += questions
@@ -432,17 +417,14 @@ def create_forum_data(all_students):
                     int(round(random.normalvariate(max_items * 0.5 *
                                                    midterm_score / 10,
                                                    max_items * 0.15)))
-            if views > max_items:
-                views = max_items
-            if views < 0:
-                views = 0
-
+            views = min(views, max_items)
+            views = max(views, 0)
             # Make sure "views" is not less than contr or quesitons
             if views < contr or views < questions:
                 views = max(contr, questions)
 
             # Insert the value in the student forum data
-            forum_student_data['Views ' + str(week_n)] = views
+            forum_student_data[f'Views {str(week_n)}'] = views
 
             # Accumulate for the final field
             views_acc += views
@@ -472,8 +454,6 @@ def create_project_data(all_students):
 
     # Loop for all the students
     for idx, student_info in all_students.iterrows():
-        project_student_data = {'SID': student_info['SID']}
-
         if student_info['Enrolment Type'] == 'International':
             p_weights_structure = [.7, .2, .1]
             p_weights_prez = [.2, .5, .3]
@@ -481,10 +461,12 @@ def create_project_data(all_students):
             p_weights_structure = [.6, .3, .1]
             p_weights_prez = [.7, .2, .1]
 
-        project_student_data['Structure'] = str(choice(
-            levels_of_attainment,
-            1,
-            p=p_weights_structure)[0])
+        project_student_data = {
+            'SID': student_info['SID'],
+            'Structure': str(
+                choice(levels_of_attainment, 1, p=p_weights_structure)[0]
+            ),
+        }
         project_student_data['Presentation'] = str(choice(
             levels_of_attainment,
             1,
@@ -518,11 +500,7 @@ def create_blended_file(all_students):
         blended_student = {'SID': student_info['SID']}
 
         midterm_score = student_info.get('Total', 0)
-        if pd.isna(midterm_score):
-            midterm_score = 0.0
-        else:
-            midterm_score = int(midterm_score)
-
+        midterm_score = 0.0 if pd.isna(midterm_score) else int(midterm_score)
         # Loop for weeks 2 to 6
         for week_n in range(2, 6):
 
@@ -530,38 +508,32 @@ def create_blended_file(all_students):
             perc = [random.normalvariate(midterm_score,
                 20 - (midterm_score * 1.0) / 10)
                     for _ in range(0, 4)]
-            perc = [100 if x > 100 else x for x in perc]
-            perc = [0 if x < 0 else x for x in perc]
+            perc = [min(x, 100) for x in perc]
+            perc = [max(x, 0) for x in perc]
 
             perc[0] = int(perc[0] * 100) / 100.0
             perc[1] = int(perc[1] * 100) / 100.0
-            blended_student['Video_1_W' + str(week_n)] = perc[0]
-            blended_student['Video_2_W' + str(week_n)] = perc[1]
+            blended_student[f'Video_1_W{str(week_n)}'] = perc[0]
+            blended_student[f'Video_2_W{str(week_n)}'] = perc[1]
             q1 = round(perc[2] / 20)
             q2 = round(perc[3] / 20)
-            blended_student['Questions_1_W' + str(week_n)] = q1
-            blended_student['Questions_2_W' + str(week_n)] = q2
+            blended_student[f'Questions_1_W{str(week_n)}'] = q1
+            blended_student[f'Questions_2_W{str(week_n)}'] = q2
 
             # Percentage of correct questions
             value = random.normalvariate(midterm_score, 30)
-            if value < 0:
-                value = 0
-            if value > 100:
-                value = 100
+            value = max(value, 0)
+            value = min(value, 100)
             value = round(value / 20)
-            if value > q1:
-                value = q1
-            blended_student['Correct_1_W' + str(week_n)] = value
+            value = min(value, q1)
+            blended_student[f'Correct_1_W{str(week_n)}'] = value
 
             value = random.normalvariate(midterm_score, 30)
-            if value < 0:
-                value = 0
-            if value > 100:
-                value = 100
+            value = max(value, 0)
+            value = min(value, 100)
             value = round(value / 20)
-            if value > q2:
-                value = q2
-            blended_student['Correct_2_W' + str(week_n)] = value
+            value = min(value, q2)
+            blended_student[f'Correct_2_W{str(week_n)}'] = value
 
         blended_indicators = blended_indicators.append(
             blended_student,
@@ -733,8 +705,5 @@ def main(file_name=None, num_students=500):
 
 # Execution as script
 if __name__ == "__main__":
-    n_students = 500
-    if len(sys.argv) > 2:
-        n_students = int(sys.argv[2])
-
+    n_students = int(sys.argv[2]) if len(sys.argv) > 2 else 500
     main(sys.argv[1], n_students)

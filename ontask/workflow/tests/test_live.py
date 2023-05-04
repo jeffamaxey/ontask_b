@@ -236,8 +236,6 @@ class WorkflowAttribute(tests.OnTaskLiveTestCase):
     filename = os.path.join(settings.ONTASK_FIXTURE_DIR, 'simple_workflow.sql')
 
     def test_workflow_attributes(self):
-        pass
-
         # Login
         self.login('instructor01@bogus.com')
 

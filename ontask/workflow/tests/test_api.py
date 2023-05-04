@@ -19,7 +19,7 @@ class WorkflowApiCreate(tests.OnTaskApiTestCase):
         super().setUp()
         # Get the token for authentication and set credentials in client
         token = Token.objects.get(user__email='instructor01@bogus.com')
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
 
     def test_workflow_list(self):
         # Get list of workflows
@@ -49,37 +49,40 @@ class WorkflowApiCreate(tests.OnTaskApiTestCase):
         # Create a second one
         response = self.client.post(
             reverse('workflow:api_workflows'),
-            {'name': tests.wflow_name + '2', 'attributes': {'one': 'two'}},
-            format='json')
+            {'name': f'{tests.wflow_name}2', 'attributes': {'one': 'two'}},
+            format='json',
+        )
 
         # Compare the workflows
-        workflow = models.Workflow.objects.get(name=tests.wflow_name + '2')
+        workflow = models.Workflow.objects.get(name=f'{tests.wflow_name}2')
         self.compare_wflows(response.data, workflow)
 
     def test_workflow_no_post_on_update(self):
         # POST method is not allowed in this URL
         response = self.client.post(
-            reverse(
-                'workflow:api_rud',
-                kwargs={'pk': 1}),
-            {'name': tests.wflow_name + '2'})
+            reverse('workflow:api_rud', kwargs={'pk': 1}),
+            {'name': f'{tests.wflow_name}2'},
+        )
 
         # Verify that the method post is not allowed
         self.assertIn('Method "POST" not allowed', response.data['detail'])
 
     def test_workflow_update(self):
         # Run the update (PUT) method
-        response = self.client.put(reverse('workflow:api_rud',
-            kwargs={'pk': 1}),
-            {'name': tests.wflow_name + '2',
-             'description_text': tests.wflow_desc + '2',
-             'attributes': {'k1': 'v1'}},
-            format='json')
+        response = self.client.put(
+            reverse('workflow:api_rud', kwargs={'pk': 1}),
+            {
+                'name': f'{tests.wflow_name}2',
+                'description_text': f'{tests.wflow_desc}2',
+                'attributes': {'k1': 'v1'},
+            },
+            format='json',
+        )
 
         # Get the workflow and verify
         wflow_id = response.data['id']
         workflow = models.Workflow.objects.get(id=wflow_id)
-        self.assertEqual(workflow.name, tests.wflow_name + '2')
+        self.assertEqual(workflow.name, f'{tests.wflow_name}2')
 
     def test_workflow_delete(self):
         # Run the update delete

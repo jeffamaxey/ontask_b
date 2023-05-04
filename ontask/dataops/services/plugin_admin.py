@@ -68,9 +68,7 @@ class PluginAdminTable(tables.Table):
             name=models.Log.PLUGIN_EXECUTE,
             payload__name=record.name,
         ).order_by(F('created').desc()).first()
-        if not log_item:
-            return '—'
-        return log_item.created
+        return log_item.created if log_item else '—'
 
     @staticmethod
     def render_num_executions(record) -> int:
@@ -302,9 +300,8 @@ def _verify_plugin(pinobj: models.Plugin) -> List[Tuple[str, str]]:
 
             # And translate the initial value to the right type
             diag[check_idx] = _('Incorrect initial value')
-            if pinit:
-                if t_func(pinit) is None:
-                    return list(zip(diag, _checks))
+            if pinit and t_func(pinit) is None:
+                return list(zip(diag, _checks))
 
             if phelp and not isinstance(phelp, str):
                 diag[check_idx] = _('Help text must be as string')
@@ -389,15 +386,11 @@ def load_plugin(foldername):
         # Run some additional checks in the instance and if it does not
         # comply with them, bail out.
         tests = _verify_plugin(plugin_instance)
-        if not all(test_result == 'Ok' for test_result, __ in tests):
+        if any(test_result != 'Ok' for test_result, __ in tests):
             return None, tests
-    except AttributeError:
-        raise services.OnTasDataopsPluginInstantiationError(
-            message=ugettext('Error while instantiating the plugin class'))
     except Exception:
         raise services.OnTasDataopsPluginInstantiationError(
             message=ugettext('Error while instantiating the plugin class'))
-
     return plugin_instance, tests
 
 

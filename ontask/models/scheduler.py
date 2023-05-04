@@ -206,7 +206,7 @@ class ScheduledOperation(Owner, NameAndDescription, CreateModifyFields):
             payload['action'] = self.action.name
             payload['action_id'] = self.action.id
 
-        payload.update(kwargs)
+        payload |= kwargs
         return Log.objects.register(
             self.user,
             operation_type,

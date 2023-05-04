@@ -37,11 +37,10 @@ def _create_filename_template(
         file_name_template = (
             '{user_fname}_{part_id}_assignsubmission_file_'
         )
+    elif user_fname_column:
+        file_name_template = '{part_id}_{user_fname}_'
     else:
-        if user_fname_column:
-            file_name_template = '{part_id}_{user_fname}_'
-        else:
-            file_name_template = '{part_id}'
+        file_name_template = '{part_id}'
     if payload['file_suffix']:
         file_name_template += payload['file_suffix']
     else:
@@ -170,8 +169,8 @@ class ActionManagerZip(ActionRunManager):
         # Get the information from the payload
         if not action:
             action = workflow.actions.filter(pk=payload['action_id']).first()
-            if not action:
-                return redirect('home')
+        if not action:
+            return redirect('home')
 
         self._create_log_event(
             request.user,

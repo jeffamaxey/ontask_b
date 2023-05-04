@@ -50,11 +50,15 @@ class ScheduleActionTable(tables.Table):
     @staticmethod
     def render_frequency(record):
         """Create the cron description."""
-        if not record.frequency:
-            return ''
-        return str(ExpressionDescriptor(
-            record.frequency,
-            casing_type=CasingTypeEnum.LowerCase))
+        return (
+            str(
+                ExpressionDescriptor(
+                    record.frequency, casing_type=CasingTypeEnum.LowerCase
+                )
+            )
+            if record.frequency
+            else ''
+        )
 
     @staticmethod
     def render_enabled(record):
@@ -68,14 +72,15 @@ class ScheduleActionTable(tables.Table):
     def render_status(record):
         """Render status as a link."""
         log_item = record.last_executed_log
-        if not log_item:
-            return record.get_status_display()
-
-        # At this point, the object is not pending. Produce a link
-        return format_html(
-            '<a class="spin" href="{0}">{1}</a>',
-            reverse('logs:page_view', kwargs={'pk': log_item.id}),
-            record.get_status_display())
+        return (
+            format_html(
+                '<a class="spin" href="{0}">{1}</a>',
+                reverse('logs:page_view', kwargs={'pk': log_item.id}),
+                record.get_status_display(),
+            )
+            if log_item
+            else record.get_status_display()
+        )
 
     class Meta:
         """Choose model, fields and sequence in the table."""

@@ -29,11 +29,13 @@ class SQLConnectionForm(ConnectionForm):
         """Validate the initial value."""
         form_data = super().clean()
 
-        # Check if the name already exists
-        name_exists = models.SQLConnection.objects.filter(
-            name=self.cleaned_data['name'],
-        ).exclude(id=self.instance.id).exists()
-        if name_exists:
+        if (
+            name_exists := models.SQLConnection.objects.filter(
+                name=self.cleaned_data['name'],
+            )
+            .exclude(id=self.instance.id)
+            .exists()
+        ):
             self.add_error(
                 'name',
                 _('There is already a connection with this name.'),
@@ -111,11 +113,13 @@ class AthenaConnectionForm(ConnectionForm):
         """Validate the initial value."""
         form_data = super().clean()
 
-        # Check if the name already exists
-        name_exists = models.AthenaConnection.objects.filter(
-            name=self.cleaned_data['name'],
-        ).exclude(id=self.instance.id).exists()
-        if name_exists:
+        if (
+            name_exists := models.AthenaConnection.objects.filter(
+                name=self.cleaned_data['name'],
+            )
+            .exclude(id=self.instance.id)
+            .exists()
+        ):
             self.add_error(
                 'name',
                 _('There is already a connection with this name.'),

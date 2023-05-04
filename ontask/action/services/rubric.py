@@ -58,16 +58,11 @@ def _create_rubric_table(
     if not criteria:
         return
 
-    # Create the extra columns in the table with the categories
-    extra_columns = []
     loas = criteria[0].column.categories
-    # Get the extra columns for the rubric
-    for idx, loa in enumerate(loas):
-        extra_columns.append((
-            'loa_{0}'.format(idx),
-            tables.Column(verbose_name=loa)
-        ))
-
+    extra_columns = [
+        ('loa_{0}'.format(idx), tables.Column(verbose_name=loa))
+        for idx, loa in enumerate(loas)
+    ]
     # Create the table data
     table_data = []
     cell_ctx = {'action_id': action.id}

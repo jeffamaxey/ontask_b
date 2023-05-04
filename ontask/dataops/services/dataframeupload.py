@@ -96,16 +96,16 @@ def load_df_from_s3(
     :param skipfooter: Number of lines to skip at the bottom of the document
     :return: Resulting data frame, or an Exception.
     """
-    path_prefix = ''
-    if aws_key and aws_secret:
-        # If key/secret are given, create prefix
-        path_prefix = '{0}:{1}@'.format(aws_key, aws_secret)
-
     if settings.ONTASK_TESTING:
         uri = 'file:///{0}/{1}'.format(
             bucket_name,
             file_path)
     else:
+        path_prefix = (
+            '{0}:{1}@'.format(aws_key, aws_secret)
+            if aws_key and aws_secret
+            else ''
+        )
         uri = 's3://{0}{1}/{2}'.format(
             path_prefix,
             bucket_name,
@@ -210,7 +210,7 @@ def batch_load_df_from_athenaconnection(
     """
     staging_dir = 's3://{0}'.format(conn.aws_bucket_name)
     if conn.aws_file_path:
-        staging_dir = staging_dir + '/' + conn.aws_file_path
+        staging_dir = f'{staging_dir}/' + conn.aws_file_path
 
     cursor = connect(
         aws_access_key_id=conn.aws_access_key,

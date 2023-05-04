@@ -54,9 +54,7 @@ def criterion_create(
         )
         return http.JsonResponse({'html_redirect': ''})
 
-    # If the request has the 'action_content', update the action
-    action_content = request.POST.get('action_content')
-    if action_content:
+    if action_content := request.POST.get('action_content'):
         action.set_text_content(action_content)
 
     # Form to read/process data
@@ -211,9 +209,7 @@ def criterion_insert(
     :param action: Action object where the criterion is inserted
     :return: JSON response
     """
-    # If the request has the 'action_content', update the action
-    action_content = request.POST.get('action_content')
-    if action_content:
+    if action_content := request.POST.get('action_content'):
         action.set_text_content(action_content)
 
     criteria = action.column_condition_pair.filter(action_id=pk)

@@ -51,12 +51,9 @@ def trim_column_names(apps, schema_editor):
     :return:
     """
     for wflow in Workflow.objects.all():
-        rename_cols = []
-        for column in wflow.columns.all():
-            if len(column.name) <= 63:
-                continue
-            rename_cols.append(column)
-
+        rename_cols = [
+            column for column in wflow.columns.all() if len(column.name) > 63
+        ]
         if not rename_cols:
             continue
 

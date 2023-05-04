@@ -23,12 +23,9 @@ class LogManager(models.Manager):
         payload: Dict
     ) -> 'Log':
         """Handle user, name, workflow and payload."""
-        log_item = self.create(
-            user=user,
-            name=name,
-            workflow=workflow,
-            payload=payload)
-        return log_item
+        return self.create(
+            user=user, name=name, workflow=workflow, payload=payload
+        )
 
 
 class Log(Owner):
@@ -254,10 +251,7 @@ class Log(Owner):
 
         :return: The JSON structure with the payload
         """
-        if self.payload == '':
-            return {}
-
-        return json.loads(self.payload)
+        return {} if self.payload == '' else json.loads(self.payload)
 
     def set_payload(self, payload):
         """Save the payload structure as text.

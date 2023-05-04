@@ -246,7 +246,7 @@ class ColumnAddRandomColumnForm(tests.OnTaskTestCase):
         self.assertEqual(new_column.data_type, 'boolean')
         data_frame = pandas.load_table(
             self.workflow.get_data_frame_table_name())
-        self.assertTrue(all(not element for element in data_frame[cname]))
+        self.assertTrue(not any(data_frame[cname]))
         # Delete the column
         services.delete_column(self.workflow.user, self.workflow, new_column)
 

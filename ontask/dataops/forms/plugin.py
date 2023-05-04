@@ -32,37 +32,28 @@ class PluginInfoForm(forms.Form):
     def _create_datatype_field(p_type, p_help, lbl):
         """Create a new field depending on the datatype."""
         if p_type == 'integer':
-            new_field = forms.IntegerField(
-                label=lbl,
-                required=False,
-                help_text=p_help)
+            return forms.IntegerField(label=lbl, required=False, help_text=p_help)
 
         elif p_type == 'double':
-            new_field = forms.FloatField(
-                label=lbl,
-                required=False,
-                help_text=p_help)
+            return forms.FloatField(label=lbl, required=False, help_text=p_help)
 
         elif p_type == 'string':
-            new_field = forms.CharField(
+            return forms.CharField(
                 max_length=STRING_PARAM_MAX_LENGTH,
                 strip=True,
                 required=False,
                 label=lbl,
-                help_text=p_help)
+                help_text=p_help,
+            )
         elif p_type == 'boolean':
-            new_field = forms.BooleanField(
-                required=False,
-                label=lbl,
-                help_text=p_help)
+            return forms.BooleanField(required=False, label=lbl, help_text=p_help)
         else:  # p_type == 'datetime':
-            new_field = forms.DateTimeField(
+            return forms.DateTimeField(
                 required=False,
                 label=lbl,
                 widget=DateTimePickerInput(options=DATE_TIME_WIDGET_OPTIONS),
-                help_text=p_help)
-
-        return new_field
+                help_text=p_help,
+            )
 
     def _create_output_column_fields(self):
         """Create the fields for the outputs and the output suffix."""
@@ -102,11 +93,7 @@ class PluginInfoForm(forms.Form):
             if p_allow:
                 new_field.initial = (p_init, p_init)
             else:
-                if p_type == 'datetime':
-                    new_field.initial = parse_datetime(p_init)
-                else:
-                    new_field.initial = p_init
-
+                new_field.initial = parse_datetime(p_init) if p_type == 'datetime' else p_init
             # Insert the new_field in the form
             self.fields[self.param_field_pattern % idx] = new_field
 
@@ -203,12 +190,14 @@ class PluginInfoForm(forms.Form):
         workflow and return the list of names
         :return: List of column names
         """
-        if not self.plugin_instance.output_column_names:
-            return []
-
-        return [
-            self.cleaned_data[self.out_field_pattern % index]
-            for index in range(len(self.plugin_instance.output_column_names))]
+        return (
+            [
+                self.cleaned_data[self.out_field_pattern % index]
+                for index in range(len(self.plugin_instance.output_column_names))
+            ]
+            if self.plugin_instance.output_column_names
+            else []
+        )
 
     def get_parameters(self) -> Dict:
         """Create a dictionary with the given parameters.

@@ -37,10 +37,10 @@ def get_column_value_list(
         file_in = codecs.open(file_name, 'rU')
         dialect = csv.Sniffer().sniff(file_in.read(1024))
         file_in.seek(0)
-        data_in = csv.reader(file_in, dialect=dialect, delimiter=str(','))
+        data_in = csv.reader(file_in, dialect=dialect, delimiter=',')
 
         if debug:
-            print('Parsing file ' + file_name)
+            print(f'Parsing file {file_name}')
 
         line_number = 0
         header_detected = False
@@ -107,7 +107,7 @@ def create_users(emails, password, group=None, debug=False):
             user.save()
 
         if debug and created:
-            print('User ' + email + ' created.')
+            print(f'User {email} created.')
 
         if not group:
             # No need to add to group
@@ -115,8 +115,7 @@ def create_users(emails, password, group=None, debug=False):
 
         if group not in user.groups.all():
             if debug:
-                print('Adding user ' + user.email + ' to group ' +
-                      group.name)
+                print(f'Adding user {user.email} to group {group.name}')
 
             user.groups.add(group)
             user.save()
@@ -145,11 +144,7 @@ def run(*script_args):
        name (option -e) or 'email' and creating the users accordingly.
     """
 
-    # Parse the arguments
-    argv = []
-    if script_args:
-        argv = shlex.split(script_args[0])
-
+    argv = shlex.split(script_args[0]) if script_args else []
     # Default values for the arguments
     debug = False
     email_column_name = 'email'
@@ -168,10 +163,10 @@ def run(*script_args):
     for optstr, value in opts:
         if optstr == "-d":
             debug = True
-        elif optstr == "-i":
-            make_instructors = True
         elif optstr == "-e":
             email_column_name = value
+        elif optstr == "-i":
+            make_instructors = True
         elif optstr == "-p":
             password = value
 
@@ -179,9 +174,9 @@ def run(*script_args):
 
     if debug:
         print('Options:')
-        print(' Debug:' + str(debug))
+        print(f' Debug:{str(debug)}')
         print(' Email column name:', email_column_name)
-        print(' Make instructors:', str(make_instructors))
+        print(' Make instructors:', make_instructors)
         print(' Default password: ', password)
         print(' Files: ' + ', '.join(filenames))
 
@@ -201,7 +196,7 @@ def run(*script_args):
         group = None
 
     # If there is no argument we are done.
-    if len(script_args) == 0:
+    if not script_args:
         return
 
     if debug:
@@ -210,8 +205,7 @@ def run(*script_args):
     if not make_instructors:
         group = None
 
-    not_present = [x for x in filenames if not os.path.exists(x)]
-    if not_present:
+    if not_present := [x for x in filenames if not os.path.exists(x)]:
         print('These files were not found: ', ', '.join(not_present))
         filenames = [x for x in filenames if x not in not_present]
 

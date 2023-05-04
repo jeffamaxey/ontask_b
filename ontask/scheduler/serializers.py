@@ -50,12 +50,11 @@ class ScheduledOperationSerializer(serializers.ModelSerializer):
             # The action could not be found.
             raise APIException(_('Incorrect permission to manipulate action.'))
 
-        # Execution date/times must be correct
-        diagnostic_msg = models.ScheduledOperation.validate_times(
+        if diagnostic_msg := models.ScheduledOperation.validate_times(
             validated_data.get('execute'),
             validated_data.get('frequency'),
-            validated_data.get('execute_until'))
-        if diagnostic_msg:
+            validated_data.get('execute_until'),
+        ):
             raise APIException(diagnostic_msg)
 
         # Check that the received object has a payload
@@ -164,9 +163,9 @@ class ScheduledEmailSerializer(ScheduledOperationSerializer):
             column_data = sql.get_rows(
                 action.workflow.get_data_frame_table_name(),
                 column_names=[item_column.name])
-            incorrect_email = get_incorrect_email(
-                [row[item_column.name] for row in column_data])
-            if incorrect_email:
+            if incorrect_email := get_incorrect_email(
+                [row[item_column.name] for row in column_data]
+            ):
                 # column has incorrect email addresses
                 raise APIException(
                     _('Incorrect email value "{0}".').format(incorrect_email))
@@ -176,10 +175,9 @@ class ScheduledEmailSerializer(ScheduledOperationSerializer):
         payload['item_column'] = item_column.id
 
         try:
-            incorrect_email = get_incorrect_email(
-                [email for email in payload.get('cc_email', '').split()
-                 if email])
-            if incorrect_email:
+            if incorrect_email := get_incorrect_email(
+                [email for email in payload.get('cc_email', '').split() if email]
+            ):
                 raise APIException(
                     _('Incorrect email value "{0}".').format(incorrect_email))
         except Exception:
@@ -187,10 +185,9 @@ class ScheduledEmailSerializer(ScheduledOperationSerializer):
                 _('cc_email must be a space-separated list of emails.'))
 
         try:
-            incorrect_email = get_incorrect_email(
-                [email for email in payload.get('bcc_email', '').split()
-                 if email])
-            if incorrect_email:
+            if incorrect_email := get_incorrect_email(
+                [email for email in payload.get('bcc_email', '').split() if email]
+            ):
                 raise APIException(
                     _('Incorrect email value "{0}".').format(incorrect_email))
         except Exception:

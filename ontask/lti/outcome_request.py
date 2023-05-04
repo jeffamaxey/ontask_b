@@ -178,8 +178,7 @@ class OutcomeRequest:
                                               'imsx_messageIdentifier')
         message_identifier.text = self.message_identifier
         body = etree.SubElement(root, 'imsx_POXBody')
-        request = etree.SubElement(body, '%s%s' % (self.operation,
-                                                   'Request'))
+        request = etree.SubElement(body, f'{self.operation}Request')
         record = etree.SubElement(request, 'resultRecord')
 
         guid = etree.SubElement(record, 'sourceGUID')

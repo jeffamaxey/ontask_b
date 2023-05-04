@@ -40,12 +40,14 @@ class WorkflowTestViewWorkflowCrud(tests.OnTaskTestCase):
             {'wid': self.workflow.id},
             method='POST',
             req_params={
-                'name': self.workflow.name + '2',
-                'description_text': 'description'},
-            is_ajax=True)
+                'name': f'{self.workflow.name}2',
+                'description_text': 'description',
+            },
+            is_ajax=True,
+        )
         self.assertTrue(status.is_success(resp.status_code))
         self.workflow.refresh_from_db()
-        self.assertEqual(self.workflow_name + '2', self.workflow.name)
+        self.assertEqual(f'{self.workflow_name}2', self.workflow.name)
         self.assertEqual(self.workflow.description_text, 'description')
 
     def test_workflow_clone_and_delete(self):

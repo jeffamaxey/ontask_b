@@ -70,11 +70,12 @@ def copy_table_content(apps, schema_editor):
                     sql.Identifier(final_name))
             )
 
-            if start_name + '_id_seq' in sequence_names:
+            if f'{start_name}_id_seq' in sequence_names:
                 cursor.execute(
                     sql.SQL(__sql_rename_sequence).format(
-                        sql.Identifier(start_name + '_id_seq'),
-                        sql.Identifier(final_name + '_id_seq'))
+                        sql.Identifier(f'{start_name}_id_seq'),
+                        sql.Identifier(f'{final_name}_id_seq'),
+                    )
                 )
 
 

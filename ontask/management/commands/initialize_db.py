@@ -66,10 +66,9 @@ class Command(BaseCommand):
             return
 
         filenames = options['csvfile']
-        not_present = [
+        if not_present := [
             fname for fname in filenames if not os.path.exists(fname)
-        ]
-        if not_present:
+        ]:
             self.stdout.write(self.style.ERROR(
                 'These files were not found: ' + ', '.join(not_present),
             ))
@@ -120,10 +119,10 @@ class Command(BaseCommand):
             file_in = codecs.open(file_name, 'rU')
             dialect = csv.Sniffer().sniff(file_in.read(1024))
             file_in.seek(0)
-            data_in = csv.reader(file_in, dialect=dialect, delimiter=str(','))
+            data_in = csv.reader(file_in, dialect=dialect, delimiter=',')
 
             if debug:
-                print('Parsing file ' + file_name)
+                print(f'Parsing file {file_name}')
 
             to_return += process_csv_file(data_in, column_name)
 
@@ -151,7 +150,7 @@ class Command(BaseCommand):
                 user.save()
 
             if debug and created:
-                print('User ' + email + ' created.')
+                print(f'User {email} created.')
 
             if not group:
                 # No need to add to group
@@ -159,9 +158,7 @@ class Command(BaseCommand):
 
             if group not in user.groups.all():
                 if debug:
-                    print(
-                        'Adding user ' + user.email + ' to group '
-                        + group.name)
+                    print(f'Adding user {user.email} to group {group.name}')
 
                 user.groups.add(group)
                 user.save()

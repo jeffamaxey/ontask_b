@@ -61,11 +61,13 @@ def _error_redirect(
 def ajax_required(func: Callable) -> Callable:
     """Verify that the request is AJAX."""
     @wraps(func)
-    def function_wrapper(request, *args, **kwargs):  # noqa Z430
+    def function_wrapper(request, *args, **kwargs):    # noqa Z430
         """Verify that request is ajax and if so, call func."""
-        if not request.is_ajax():
-            return http.HttpResponseBadRequest()
-        return func(request, *args, **kwargs)
+        return (
+            func(request, *args, **kwargs)
+            if request.is_ajax()
+            else http.HttpResponseBadRequest()
+        )
 
     return function_wrapper
 

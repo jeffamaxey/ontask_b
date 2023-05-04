@@ -44,9 +44,7 @@ class AttributeItemForm(forms.Form):
 
         attr_name = form_data['key']
 
-        # Name is legal
-        msg = is_legal_name(attr_name)
-        if msg:
+        if msg := is_legal_name(attr_name):
             self.add_error('key', msg)
             return form_data
 

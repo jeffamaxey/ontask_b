@@ -58,7 +58,7 @@ version = u'B.7.2'
 release = version
 
 # General information about the project.
-project = u'OnTask (' + version + ')'
+project = f'OnTask ({version})'
 copyright = u'Content Licensed under Creative Commons BY 4.0'
 author = u'Abelardo Pardo'
 

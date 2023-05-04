@@ -27,18 +27,18 @@ class EditActionOutForm(forms.ModelForm):
         super().__init__(*args, **kargs)
 
         # Personalized text, canvas email
-        if (
-            self.instance.action_type == models.Action.PERSONALIZED_TEXT
-            or self.instance.action_type == models.Action.RUBRIC_TEXT
-            or self.instance.action_type == models.Action.EMAIL_REPORT
-        ):
+        if self.instance.action_type in [
+            models.Action.PERSONALIZED_TEXT,
+            models.Action.RUBRIC_TEXT,
+            models.Action.EMAIL_REPORT,
+        ]:
             self.fields['text_content'].widget = SummernoteInplaceWidget()
 
         # Add the Target URL field
-        if (
-            self.instance.action_type == models.Action.PERSONALIZED_JSON
-            or self.instance.action_type == models.Action.JSON_REPORT
-        ):
+        if self.instance.action_type in [
+            models.Action.PERSONALIZED_JSON,
+            models.Action.JSON_REPORT,
+        ]:
             # Add the target_url field
             self.fields['target_url'] = forms.CharField(
                 initial=self.instance.target_url,

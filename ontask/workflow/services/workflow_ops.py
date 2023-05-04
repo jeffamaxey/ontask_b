@@ -129,9 +129,9 @@ def update_luser_email_column(
     # Get the column content
     emails = sql.get_rows(table_name, column_names=[column.name])
 
-    # Verify that the column as a valid set of emails
-    incorrect_email = get_incorrect_email([row[column.name] for row in emails])
-    if incorrect_email:
+    if incorrect_email := get_incorrect_email(
+        [row[column.name] for row in emails]
+    ):
         raise services.OnTaskWorkflowEmailError(
             message=_('Incorrect email addresses "{0}".').format(
                 incorrect_email))

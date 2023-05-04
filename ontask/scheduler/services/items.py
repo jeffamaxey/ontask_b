@@ -48,22 +48,16 @@ def create_timedelta_string(
     :param utime: until datetime object
     :return: String rendering
     """
-    diagnostic_msg = models.ScheduledOperation.validate_times(
-        ftime,
-        frequency,
-        utime)
-    if diagnostic_msg:
+    if diagnostic_msg := models.ScheduledOperation.validate_times(
+        ftime, frequency, utime
+    ):
         return None
 
     now = datetime.now(pytz.timezone(settings.TIME_ZONE))
 
     if ftime and not frequency and not utime:
         # Single execution
-        if ftime < now and not utime:
-            return None
-
-        return ftime.strftime('%H:%M:%S %z %Y/%b/%d')
-
+        return None if ftime < now else ftime.strftime('%H:%M:%S %z %Y/%b/%d')
     # Repeating execution.
     result = str(ExpressionDescriptor(
         frequency,
@@ -80,7 +74,7 @@ def create_timedelta_string(
 
     if utime:
         # Has finish time
-        result = result + ', until ' + utime.strftime('%H:%M:%S %z %Y/%b/%d')
+        result = f'{result}, until ' + utime.strftime('%H:%M:%S %z %Y/%b/%d')
 
     return result
 

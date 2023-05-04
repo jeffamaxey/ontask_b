@@ -20,7 +20,7 @@ class LinearRegressionModel(OnTaskModel):
         model Ax + B, where x is obtained from the input column.
         """
         super().__init__()
-        self.input_column_names = list()
+        self.input_column_names = []
         self.output_column_names = ['Linear Model']
         self.parameters = [
             ('A', 'double', [], 0.0, 'Linear coefficient'),

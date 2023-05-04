@@ -201,18 +201,14 @@ def search_table(
             where_clause = where_clause + sql.SQL(' AND ')
 
         # Combine the search subqueries
-        if any_join:
-            conn_txt = ' OR '
-        else:
-            conn_txt = ' AND '
-
+        conn_txt = ' OR ' if any_join else ' AND '
         where_clause = where_clause + sql.SQL(conn_txt).join([
             sql.SQL('(CAST ({0} AS TEXT) LIKE %s)').format(
                 OnTaskDBIdentifier(cname),
             ) for cname in columns_to_search
         ])
 
-        query_fields += ['%' + search_value + '%'] * len(columns_to_search)
+        query_fields += [f'%{search_value}%'] * len(columns_to_search)
 
     if where_clause != sql.SQL(''):
         query = query + sql.SQL(' WHERE ') + where_clause

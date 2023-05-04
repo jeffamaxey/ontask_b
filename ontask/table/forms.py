@@ -60,11 +60,13 @@ class ViewAddForm(forms.ModelForm):
                 None,
                 _('There needs to be at least one key column'))
 
-        # Check if the name already exists
-        name_exists = self.workflow.views.filter(
-            name=self.cleaned_data['name'],
-        ).exclude(id=self.instance.id).exists()
-        if name_exists:
+        if (
+            name_exists := self.workflow.views.filter(
+                name=self.cleaned_data['name'],
+            )
+            .exclude(id=self.instance.id)
+            .exists()
+        ):
             self.add_error(
                 'name',
                 _('There is already a view with this name.'),

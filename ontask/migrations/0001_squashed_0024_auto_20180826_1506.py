@@ -30,8 +30,7 @@ def combine_fields_into_payload(apps, schema_editor):
     # item_column
     ScheduledAction = apps.get_model('ontask', 'ScheduledAction')
     for item in ScheduledAction.objects.all():
-        payload = {}
-        payload['subject'] = item.subject
+        payload = {'subject': item.subject}
         if item.cc_email:
             payload['cc_email'] = item.cc_email
         if item.bcc_email:

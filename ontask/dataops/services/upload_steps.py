@@ -35,14 +35,14 @@ def upload_step_two(
     src_is_key_column = upload_data.get('src_is_key_column')
     keep_key_column = upload_data.get('keep_key_column')
     for idx in range(len(initial_columns)):
-        new_name = select_column_data['new_name_%s' % idx]
+        new_name = select_column_data[f'new_name_{idx}']
         upload_data['rename_column_names'][idx] = new_name
-        upload = select_column_data['upload_%s' % idx]
+        upload = select_column_data[f'upload_{idx}']
         upload_data['columns_to_upload'][idx] = upload
 
         if src_is_key_column[idx]:
             # If the column is key, check if the user wants to keep it
-            keep_key_column[idx] = select_column_data['make_key_%s' % idx]
+            keep_key_column[idx] = select_column_data[f'make_key_{idx}']
 
     if workflow.has_data_frame():
         # A Merge operation is required
@@ -127,7 +127,7 @@ def upload_prepare_step_four(upload_data: Dict) -> List[Tuple[str, bool, str]]:
     for colname in final_columns:
 
         # Case 1: Skip the keys
-        if colname == src_selected_key or colname == dst_selected_key:
+        if colname in [src_selected_key, dst_selected_key]:
             continue
 
         # Case 2: Column is in DST and left untouched (no counter part in SRC)
@@ -151,13 +151,9 @@ def upload_prepare_step_four(upload_data: Dict) -> List[Tuple[str, bool, str]]:
         # Initial name on the dst data frame
         dst_name = colname
         # Column not present in DST, so it is a new column
-        if colname not in dst_column_names:
-            dst_name += _(' (New)')
-        else:
-            dst_name += _(' (Update)')
-
+        dst_name += _(' (New)') if colname not in dst_column_names else _(' (Update)')
         src_name = colname
-        if colname != old_name:
+        if src_name != old_name:
             src_name += _(' (Renamed)')
 
         # Cases 5 - 8

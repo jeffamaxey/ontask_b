@@ -36,9 +36,7 @@ class MultiLTILaunchAuthMiddleware:
 
         self.process_request(request)
 
-        response = self.get_response(request)
-
-        return response
+        return self.get_response(request)
 
     def process_request(self, request):
         if settings.DEBUG:

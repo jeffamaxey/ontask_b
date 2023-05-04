@@ -37,20 +37,26 @@ def view(
     sch_obj = models.ScheduledOperation.objects.filter(
         workflow=workflow,
         pk=pk).first()
-    if not sch_obj:
-        # Connection object not found, go to table of sql connections
-        return http.JsonResponse({'html_redirect': reverse('scheduler:index')})
-
-    return http.JsonResponse({
-        'html_form': render_to_string(
-            'scheduler/includes/partial_show_schedule_action.html',
+    return (
+        http.JsonResponse(
             {
-                's_vals': services.get_item_value_dictionary(sch_obj),
-                'id': sch_obj.id,
-                'timedelta': services.create_timedelta_string(
-                    sch_obj.execute,
-                    sch_obj.frequency,
-                    sch_obj.execute_until)})})
+                'html_form': render_to_string(
+                    'scheduler/includes/partial_show_schedule_action.html',
+                    {
+                        's_vals': services.get_item_value_dictionary(sch_obj),
+                        'id': sch_obj.id,
+                        'timedelta': services.create_timedelta_string(
+                            sch_obj.execute,
+                            sch_obj.frequency,
+                            sch_obj.execute_until,
+                        ),
+                    },
+                )
+            }
+        )
+        if sch_obj
+        else http.JsonResponse({'html_redirect': reverse('scheduler:index')})
+    )
 
 
 @user_passes_test(is_instructor)
@@ -71,14 +77,16 @@ def create_action_run(
         pk=pk).filter(
         Q(workflow__user=request.user)
         | Q(workflow__shared=request.user)).first()
-    if not action:
-        return redirect('home')
-
-    return services.schedule_crud_factory.crud_process(
-        action.action_type,
-        action=action,
-        schedule_item=None,
-        request=request)
+    return (
+        services.schedule_crud_factory.crud_process(
+            action.action_type,
+            action=action,
+            schedule_item=None,
+            request=request,
+        )
+        if action
+        else redirect('home')
+    )
 
 
 @user_passes_test(is_instructor)
@@ -97,15 +105,17 @@ def create_sql_upload(
     """
     conn = models.SQLConnection.objects.filter(
         pk=pk).filter(enabled=True).first()
-    if not conn:
-        return redirect('scheduler:index')
-
-    return services.schedule_crud_factory.crud_process(
-        models.Log.WORKFLOW_DATA_SQL_UPLOAD,
-        request=request,
-        workflow=workflow,
-        connection=conn,
-        schedule_item=None)
+    return (
+        services.schedule_crud_factory.crud_process(
+            models.Log.WORKFLOW_DATA_SQL_UPLOAD,
+            request=request,
+            workflow=workflow,
+            connection=conn,
+            schedule_item=None,
+        )
+        if conn
+        else redirect('scheduler:index')
+    )
 
 
 @user_passes_test(is_instructor)
@@ -126,18 +136,20 @@ def edit_scheduled_operation(
         pk=pk).filter(
         Q(workflow__user=request.user)
         | Q(workflow__shared=request.user)).first()
-    if not s_item:
-        return redirect('home')
-
-    return services.schedule_crud_factory.crud_process(
-        s_item.operation_type,
-        request=request,
-        schedule_item=s_item,
-        workflow=s_item.workflow,
-        action=s_item.action,
-        prev_url=reverse(
-            'scheduler:edit_scheduled_operation',
-            kwargs={'pk': s_item.id}))
+    return (
+        services.schedule_crud_factory.crud_process(
+            s_item.operation_type,
+            request=request,
+            schedule_item=s_item,
+            workflow=s_item.workflow,
+            action=s_item.action,
+            prev_url=reverse(
+                'scheduler:edit_scheduled_operation', kwargs={'pk': s_item.id}
+            ),
+        )
+        if s_item
+        else redirect('home')
+    )
 
 
 @user_passes_test(is_instructor)

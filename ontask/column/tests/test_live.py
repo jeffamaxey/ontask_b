@@ -52,18 +52,13 @@ class WorkflowModify(tests.OnTaskLiveTestCase):
         # First column must be age, number
         self.assert_column_name_type('age', 'Number', 1)
 
-        # ADD COLUMNS
-        idx = 5
-        for cname, ctype, clist, cinit in new_cols:
+        for idx, (cname, ctype, clist, cinit) in enumerate(new_cols, start=5):
             # ADD A NEW COLUMN
             self.add_column(cname, ctype, clist, cinit, idx)
-            idx += 1
         check_wf_df(models.Workflow.objects.get(id=1))
 
-        # CHECK THAT THE COLUMNS HAVE BEEN CREATED (starting in the sixth)
-        idx = 5
-        for cname, ctype, _, _ in new_cols:
-            if ctype == 'integer' or ctype == 'double':
+        for idx, (cname, ctype, _, _) in enumerate(new_cols, start=5):
+            if ctype in ['integer', 'double']:
                 ctype = 'Number'
             elif ctype == 'string':
                 ctype = 'Text'
@@ -73,8 +68,6 @@ class WorkflowModify(tests.OnTaskLiveTestCase):
                 ctype = 'Date and time'
 
             self.assert_column_name_type(cname, ctype, idx)
-            idx += 1
-
         # DELETE THE COLUMNS
         for cname, _, _, _ in new_cols:
             self.delete_column(cname)

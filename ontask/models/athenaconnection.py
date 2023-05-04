@@ -137,7 +137,6 @@ class AthenaConnection(Connection):
             'aws_bucket_name': self.aws_bucket_name,
             'aws_file_path': self.aws_file_path,
             'aws_region_name': self.aws_region_name,
-            'table_name': self.table_name}
-
-        payload.update(kwargs)
+            'table_name': self.table_name,
+        } | kwargs
         return Log.objects.register(user, operation_type, None, payload)

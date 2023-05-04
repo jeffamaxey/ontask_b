@@ -8,6 +8,8 @@ from django.conf import settings
 from django.db import migrations, models
 
 
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -18,11 +20,50 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Column',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=512, verbose_name='Column name')),
-                ('data_type', models.CharField(choices=[('string', 'string'), ('integer', 'integer'), ('double', 'double'), ('boolean', 'boolean'), ('datetime', 'datetime')], max_length=512, verbose_name='Type of data to store in the column')),
-                ('is_key', models.BooleanField(default=False, verbose_name='Has unique values per row')),
-                ('categories', django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=list, null=True, verbose_name='Comma separated list of allowed values')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
+                (
+                    'name',
+                    models.CharField(
+                        max_length=512, verbose_name='Column name'
+                    ),
+                ),
+                (
+                    'data_type',
+                    models.CharField(
+                        choices=[
+                            ('string', 'string'),
+                            ('integer', 'integer'),
+                            ('double', 'double'),
+                            ('boolean', 'boolean'),
+                            ('datetime', 'datetime'),
+                        ],
+                        max_length=512,
+                        verbose_name='Type of data to store in the column',
+                    ),
+                ),
+                (
+                    'is_key',
+                    models.BooleanField(
+                        default=False, verbose_name='Has unique values per row'
+                    ),
+                ),
+                (
+                    'categories',
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        blank=True,
+                        default=list,
+                        null=True,
+                        verbose_name='Comma separated list of allowed values',
+                    ),
+                ),
             ],
             options={
                 'ordering': ('-is_key', 'name'),
@@ -31,31 +72,76 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Workflow',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
                 ('name', models.CharField(max_length=512)),
-                ('description_text', models.CharField(blank=True, default='', max_length=2048)),
+                (
+                    'description_text',
+                    models.CharField(blank=True, default='', max_length=2048),
+                ),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
-                ('nrows', models.IntegerField(blank=True, default=0, verbose_name='Number of rows')),
-                ('ncols', models.IntegerField(blank=True, default=0, verbose_name='Number of columns')),
-                ('attributes', django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=dict, null=True)),
-                ('query_builder_ops', django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=dict, null=True)),
-                ('data_frame_table_name', models.CharField(blank=True, default='', max_length=1024)),
-                ('session_key', models.CharField(blank=True, default='', max_length=40)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    'nrows',
+                    models.IntegerField(
+                        blank=True, default=0, verbose_name='Number of rows'
+                    ),
+                ),
+                (
+                    'ncols',
+                    models.IntegerField(
+                        blank=True, default=0, verbose_name='Number of columns'
+                    ),
+                ),
+                (
+                    'attributes',
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        blank=True, default=dict, null=True
+                    ),
+                ),
+                (
+                    'query_builder_ops',
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        blank=True, default=dict, null=True
+                    ),
+                ),
+                (
+                    'data_frame_table_name',
+                    models.CharField(blank=True, default='', max_length=1024),
+                ),
+                (
+                    'session_key',
+                    models.CharField(blank=True, default='', max_length=40),
+                ),
+                (
+                    'user',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
             model_name='column',
             name='workflow',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='columns', to='ontask.Workflow'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='columns',
+                to='ontask.Workflow',
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='workflow',
-            unique_together=set([('user', 'name')]),
+            name='workflow', unique_together={('user', 'name')}
         ),
         migrations.AlterUniqueTogether(
-            name='column',
-            unique_together=set([('name', 'workflow')]),
+            name='column', unique_together={('name', 'workflow')}
         ),
     ]

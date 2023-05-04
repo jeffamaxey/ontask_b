@@ -144,7 +144,7 @@ USE_SSL = env.bool('USE_SSL', default=False)
 BASE_DIR = environ.Path(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
 
 if not DATAOPS_PLUGIN_DIRECTORY:
@@ -165,16 +165,14 @@ if not LOG_FOLDER:
 
 MEDIA_ROOT = join(BASE_DIR(), 'media')
 if AWS_ACCESS_KEY_ID:
-    MEDIA_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, MEDIA_LOCATION)
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/'
+    STATICFILES_DIRS = [join(BASE_DIR(), AWS_LOCATION)]
+    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
 else:
     MEDIA_URL = BASE_URL + MEDIA_LOCATION
 
-if AWS_ACCESS_KEY_ID:
-    STATICFILES_DIRS = [join(BASE_DIR(), AWS_LOCATION)]
-    STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
-else:
     STATICFILES_DIRS = [join(BASE_DIR(), STATIC_URL_SUFFIX)]
-    STATIC_URL = BASE_URL + '/' + STATIC_URL_SUFFIX + '/'
+    STATIC_URL = f'{BASE_URL}/{STATIC_URL_SUFFIX}/'
 
 STATIC_ROOT = join(BASE_DIR(), 'site', 'static')
 

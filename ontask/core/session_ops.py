@@ -55,9 +55,7 @@ def _store_workflow_nrows_in_session(
 
 def remove_workflow_from_session(request: http.HttpRequest):
     """Remove the workflowid, name and number of fows from the session."""
-    wid = request.session.pop('ontask_workflow_id', None)
-    # If removing workflow from session, mark it as available for sharing
-    if wid:
+    if wid := request.session.pop('ontask_workflow_id', None):
         models.Workflow.unlock_workflow_by_id(wid)
     request.session.pop('ontask_workflow_name', None)
     request.session.pop('ontask_workflow_rows', None)

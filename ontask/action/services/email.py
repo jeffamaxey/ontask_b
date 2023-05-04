@@ -103,8 +103,7 @@ def _check_email_list(email_list_string: str) -> List[str]:
         return []
 
     email_list = email_list_string.split()
-    incorrect_email = get_incorrect_email(email_list)
-    if incorrect_email:
+    if incorrect_email := get_incorrect_email(email_list):
         raise Exception(_('Invalid email address "{0}".').format(
             incorrect_email))
 
@@ -211,7 +210,8 @@ def _create_single_message(
             mime_obj.add_header(
                 'Content-Disposition',
                 'attachment',
-                filename=attachment.name + '.csv')
+                filename=f'{attachment.name}.csv',
+            )
             msg.attach(mime_obj)
 
     return msg

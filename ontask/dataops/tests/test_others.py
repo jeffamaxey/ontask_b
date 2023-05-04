@@ -35,10 +35,9 @@ class HasVariableTest(TestCase):
         if 'condition' not in f1 and 'condition' in f2:
             return False
 
-        if 'condition' in f1 and 'condition' in f2:
+        if 'condition' in f1:
             # Assumes that the literals are in the same order
-            return all([self.compare(a, b)
-                        for a, b in zip(f1['rules'], f2['rules'])])
+            return all(self.compare(a, b) for a, b in zip(f1['rules'], f2['rules']))
 
         # Dictionaries should have the same items (identically)
         return f1 == f2

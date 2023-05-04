@@ -123,7 +123,6 @@ def render_table_display_server_side(
     nitems = 0  # For counting the number of elements in the result
     for row in qs[dt_page.start:dt_page.start + dt_page.length]:
         nitems += 1
-        new_element = {}
         if view_id:
             stat_url = reverse(
                 'table:stat_table_view',
@@ -151,15 +150,14 @@ def render_table_display_server_side(
             },
         )
 
-        # Element to add to the final queryset
-        new_element['Operations'] = ops_string
+        new_element = {'Operations': ops_string}
         column_values = [
             rval.astimezone(timezone(
                 settings.TIME_ZONE,
             )).strftime('%Y-%m-%d %H:%M:%S  %z')
             if isinstance(rval, datetime) else rval for rval in list(row)
         ]
-        new_element.update(zip(column_names, column_values))
+        new_element |= zip(column_names, column_values)
 
         # Create the list of elements to display and add it ot the final QS
         final_qs.append(new_element)

@@ -60,15 +60,16 @@ class ConditionFilterCreateViewBase(UserIsInstructor, generic.TemplateView):
         form = self.form_class(request.POST, action=action)
         if request.method == 'POST' and form.is_valid():
 
-            if not form.has_changed():
-                return http.JsonResponse({'html_redirect': None})
-
-            return services.save_condition_form(
-                request,
-                form,
-                action,
-                is_filter=isinstance(self, FilterCreateView))
-
+            return (
+                services.save_condition_form(
+                    request,
+                    form,
+                    action,
+                    is_filter=isinstance(self, FilterCreateView),
+                )
+                if form.has_changed()
+                else http.JsonResponse({'html_redirect': None})
+            )
         return http.JsonResponse({
             'html_form': render_to_string(
                 self.template_name,
@@ -119,15 +120,13 @@ def edit_filter(
         action=condition.action)
 
     if request.method == 'POST' and form.is_valid():
-        if not form.has_changed():
-            return http.JsonResponse({'html_redirect': None})
-
-        return services.save_condition_form(
-            request,
-            form,
-            condition.action,
-            is_filter=True)
-
+        return (
+            services.save_condition_form(
+                request, form, condition.action, is_filter=True
+            )
+            if form.has_changed()
+            else http.JsonResponse({'html_redirect': None})
+        )
     return http.JsonResponse({
         'html_form': render_to_string(
             'condition/includes/partial_filter_addedit.html',
@@ -164,15 +163,13 @@ def edit_condition(
         action=condition.action)
 
     if request.method == 'POST' and form.is_valid():
-        if not form.has_changed():
-            return http.JsonResponse({'html_redirect': None})
-
-        return services.save_condition_form(
-            request,
-            form,
-            condition.action,
-            is_filter=False)
-
+        return (
+            services.save_condition_form(
+                request, form, condition.action, is_filter=False
+            )
+            if form.has_changed()
+            else http.JsonResponse({'html_redirect': None})
+        )
     return http.JsonResponse({
         'html_form': render_to_string(
             'condition/includes/partial_condition_addedit.html',
@@ -210,9 +207,7 @@ def delete_filter(
                 request=request),
         })
 
-    # If the request has 'action_content', update the action
-    action_content = request.POST.get('action_content')
-    if action_content:
+    if action_content := request.POST.get('action_content'):
         condition.action.set_text_content(action_content)
 
     condition.log(request.user, models.Log.CONDITION_DELETE)
@@ -245,9 +240,7 @@ def delete_condition(
     # Treat the two types of requests
     if request.method == 'POST':
         action = condition.action
-        # If the request has the 'action_content', update the action
-        action_content = request.POST.get('action_content')
-        if action_content:
+        if action_content := request.POST.get('action_content'):
             action.set_text_content(action_content)
 
         condition.log(request.user, models.Log.CONDITION_DELETE)

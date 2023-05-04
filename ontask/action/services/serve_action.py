@@ -57,7 +57,7 @@ def serve_action_out(
 
     # If the action content is empty, forget about it
     response = action_content
-    if action_content is None:
+    if response is None:
         response = render_to_string('action/action_unavailable.html', {})
 
     # Log the event
@@ -85,12 +85,7 @@ def get_survey_context(
     :param user_attribute_name: Name of the column to use for username
     :return: Dictionary with the context
     """
-    # Get the attribute value depending if the user is managing the workflow
-    # User is instructor, and either owns the workflow or is allowed to access
-    # it as shared
-    user_attribute_value = None
-    if is_manager:
-        user_attribute_value = request.GET.get('uatv')
+    user_attribute_value = request.GET.get('uatv') if is_manager else None
     if not user_attribute_value:
         user_attribute_value = request.user.email
 

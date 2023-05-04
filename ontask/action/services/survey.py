@@ -111,8 +111,7 @@ def _create_link_to_survey_row(
     """
     dst_url = reverse('action:run_survey_row', kwargs={'pk': action_id})
     url_parts = list(urlparse(dst_url))
-    query = dict(parse_qs(url_parts[4]))
-    query.update({'uatn': key_name, 'uatv': key_value})
+    query = dict(parse_qs(url_parts[4])) | {'uatn': key_name, 'uatv': key_value}
     url_parts[4] = urlencode(query)
 
     return '<a href="{0}">{1}</a>'.format(
@@ -139,8 +138,7 @@ def _create_initial_qs(
     if dt_page.order_col is not None:
         order_col_name = columns[dt_page.order_col].name
 
-    # Get the query set (including the filter in the action)
-    qs = sql.search_table(
+    return sql.search_table(
         table_name,
         dt_page.search_value,
         columns_to_search=[col.name for col in columns],
@@ -148,8 +146,6 @@ def _create_initial_qs(
         order_col_name=order_col_name,
         order_asc=dt_page.order_dir == 'asc',
     )
-
-    return qs
 
 
 def _create_table_qsdata(

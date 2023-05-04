@@ -97,12 +97,7 @@ class LaunchParamsMixin:
         for key, val in list(params.items()):
             if key in LAUNCH_DATA_PARAMETERS and val != 'None':
                 if key == 'roles':
-                    if isinstance(val, list):
-                        # If it's already a list, no need to parse
-                        self.roles = list(val)
-                    else:
-                        # If it's a ',' delimited string, split
-                        self.roles = val.split(',')
+                    self.roles = list(val) if isinstance(val, list) else val.split(',')
                 else:
                     setattr(self, key, str(val))
             elif 'custom_' in key:
@@ -111,10 +106,10 @@ class LaunchParamsMixin:
                 self.ext_params[key] = str(val)
 
     def set_custom_param(self, key, val):
-        self.custom_params['custom_' + key] = val
+        self.custom_params[f'custom_{key}'] = val
 
     def get_custom_param(self, key):
-        return self.custom_params['custom_' + key]
+        return self.custom_params[f'custom_{key}']
 
     def set_non_spec_param(self, key, val):
         self.non_spec_params[key] = val
@@ -123,26 +118,24 @@ class LaunchParamsMixin:
         return self.non_spec_params[key]
 
     def set_ext_param(self, key, val):
-        self.ext_params['ext_' + key] = val
+        self.ext_params[f'ext_{key}'] = val
 
     def get_ext_param(self, key):
-        return self.ext_params['ext_' + key]
+        return self.ext_params[f'ext_{key}']
 
     def to_params(self):
         """
         Createa a new dictionary with all launch data. Custom / Extension keys
         will be included. Roles are set as a ',' separated string.
         """
-        params = {}
-        custom_params = {}
-        for key in self.custom_params:
-            custom_params[key] = self.custom_params[key]
-        ext_params = {}
-        for key in self.ext_params:
-            ext_params[key] = self.ext_params[key]
-        for key in LAUNCH_DATA_PARAMETERS:
-            if getattr(self, key, None):
-                params[key] = getattr(self, key)
-        params.update(custom_params)
-        params.update(ext_params)
-        return params
+        custom_params = {key: self.custom_params[key] for key in self.custom_params}
+        ext_params = {key: self.ext_params[key] for key in self.ext_params}
+        return (
+            {
+                key: getattr(self, key)
+                for key in LAUNCH_DATA_PARAMETERS
+                if getattr(self, key, None)
+            }
+            | custom_params
+            | ext_params
+        )

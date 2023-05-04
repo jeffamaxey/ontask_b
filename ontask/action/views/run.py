@@ -62,12 +62,11 @@ def _common_run_survey_row(
             action,
             form.get_key_value_pairs())
         # If not instructor, just thank the user!
-        if not is_manager:
-            return render(request, 'thanks.html', {})
-
-        # Back to running the action
-        return redirect(reverse('action:run', kwargs={'pk': action.id}))
-
+        return (
+            redirect(reverse('action:run', kwargs={'pk': action.id}))
+            if is_manager
+            else render(request, 'thanks.html', {})
+        )
     return render(
         request,
         'action/run_survey_row.html',
@@ -202,9 +201,11 @@ def serve_action(
     :return: Http response
     """
     # Get the action object
-    action = models.Action.objects.filter(pk=int(action_id)).prefetch_related(
-        'conditions',
-    ).first()
+    action = (
+        models.Action.objects.filter(pk=action_id)
+        .prefetch_related('conditions')
+        .first()
+    )
     if not action or (not action.serve_enabled) or (not action.is_active):
         raise http.Http404
 
@@ -399,12 +400,13 @@ def show_survey_table_ss(
     del pk
     # Check that the GET parameters are correctly given
     dt_page = DataTablesServerSidePaging(request)
-    if not dt_page.is_valid:
-        return http.JsonResponse(
+    return (
+        services.create_survey_table(workflow, action, dt_page)
+        if dt_page.is_valid
+        else http.JsonResponse(
             {'error': _('Incorrect request. Unable to process')},
         )
-
-    return services.create_survey_table(workflow, action, dt_page)
+    )
 
 
 @login_required

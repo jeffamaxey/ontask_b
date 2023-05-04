@@ -44,9 +44,9 @@ def _perform_non_overlapping_column_merge(
         # values from C2_y in the previous step (Step A).
         if src_key != dst_key and src_key in dst_df.columns:
             # Drop column_y
-            new_df.drop([src_key + '_y'], axis=1, inplace=True)
+            new_df.drop([f'{src_key}_y'], axis=1, inplace=True)
             # Rename column_x
-            new_df = new_df.rename(columns={src_key + '_x': src_key})
+            new_df = new_df.rename(columns={f'{src_key}_x': src_key})
 
     return new_df
 
@@ -114,6 +114,9 @@ def _perform_overlap_update(
         ].copy()
         # Update the subset with the values in the right
         overlap_df.update(src_df_tmp1)
+    elif how_merge == 'left':
+        overlap_df = dst_df_tmp1
+        overlap_df.update(src_df_tmp1)
     elif how_merge == 'outer':
         # Update
         overlap_df = dst_df_tmp1
@@ -126,9 +129,6 @@ def _perform_overlap_update(
             # Append only if the tmp1 data frame is not empty (otherwise it
             # looses the name of the index column
             overlap_df = overlap_df.append(tmp1, sort=True)
-    elif how_merge == 'left':
-        overlap_df = dst_df_tmp1
-        overlap_df.update(src_df_tmp1)
     else:
         # Right merge
         # Subset of dst_df_tmp1 with the keys in both DFs
@@ -202,11 +202,11 @@ def validate_merge_parameters(
         return gettext(
             'Column {0} not found in new data frame').format(right_on)
 
-    if not pandas.is_unique_column(src_df[right_on]):
-        return gettext(
-            'Column {0} is not a unique key.').format(right_on)
-
-    return None
+    return (
+        None
+        if pandas.is_unique_column(src_df[right_on])
+        else gettext('Column {0} is not a unique key.').format(right_on)
+    )
 
 
 def perform_dataframe_upload_merge(
@@ -282,9 +282,10 @@ def perform_dataframe_upload_merge(
 
     # If no keep_key_column value is given, initialize to True
     if 'keep_key_column' not in merge_info:
-        kk_column = []
-        for cname in merge_info['rename_column_names']:
-            kk_column.append(pandas.is_unique_column(src_df[cname]))
+        kk_column = [
+            pandas.is_unique_column(src_df[cname])
+            for cname in merge_info['rename_column_names']
+        ]
         merge_info['keep_key_column'] = kk_column
 
     # Get the keys

@@ -61,10 +61,10 @@ def index_ss(
     """
     # Check that the GET parameter are correctly given
     dt_page = DataTablesServerSidePaging(request)
-    if not dt_page.is_valid:
-        return http.JsonResponse(
+    return (
+        http.JsonResponse(services.column_table_server_side(dt_page, workflow))
+        if dt_page.is_valid
+        else http.JsonResponse(
             {'error': _('Incorrect request. Unable to process')},
         )
-
-    return http.JsonResponse(
-        services.column_table_server_side(dt_page, workflow))
+    )

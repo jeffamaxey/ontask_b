@@ -97,14 +97,16 @@ def check_key_columns(workflow: models.Workflow):
     :param workflow: Object to use for the verification.
     :return: Nothing. Raise exception if key column lost the property.
     """
-    col_name = next(
+    if col_name := next(
         (
-            col.name for col in workflow.columns.filter(is_key=True)
+            col.name
+            for col in workflow.columns.filter(is_key=True)
             if not sql.is_column_unique(
-                workflow.get_data_frame_table_name(),
-                col.name)),
-        None)
-    if col_name:
+                workflow.get_data_frame_table_name(), col.name
+            )
+        ),
+        None,
+    ):
         raise Exception(_(
             'The new data does not preserve the key '
             + 'property of column "{0}"'.format(col_name)))

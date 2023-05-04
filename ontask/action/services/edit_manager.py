@@ -79,44 +79,37 @@ class ActionEditManager:
         """Get the initial context to render the response."""
         filter_condition = action.get_filter()
         return {
-            # Workflow elements
-            'attribute_names': [
-                attr for attr in list(action.workflow.attributes.keys())
-            ],
+            'attribute_names': list(list(action.workflow.attributes.keys())),
             'columns': action.workflow.columns.all(),
             'has_data': action.workflow.has_table(),
             'total_rows': action.workflow.nrows,
-
-            # Action Elements
             'action': action,
             'form': form,
             'form_filter': form_filter,
             'filter_condition': filter_condition,
-            'selected_rows':
-                filter_condition.n_rows_selected
-                if filter_condition else -1,
-            'is_email_report':
-                action.action_type == models.Action.EMAIL_REPORT,
-            'is_report': (
-                action.action_type == models.Action.EMAIL_REPORT
-                or action.action_type == models.Action.JSON_REPORT),
-            'is_personalized_text': (
-                action.action_type == models.Action.PERSONALIZED_TEXT),
+            'selected_rows': filter_condition.n_rows_selected
+            if filter_condition
+            else -1,
+            'is_email_report': action.action_type == models.Action.EMAIL_REPORT,
+            'is_report': action.action_type
+            in [models.Action.EMAIL_REPORT, models.Action.JSON_REPORT],
+            'is_personalized_text': action.action_type
+            == models.Action.PERSONALIZED_TEXT,
             'is_rubric': action.action_type == models.Action.RUBRIC_TEXT,
             'is_survey': action.action_type == models.Action.SURVEY,
             'all_false_conditions': any(
-                cond.n_rows_selected == 0
-                for cond in action.conditions.all()),
-            'rows_all_false': action.get_row_all_false_count(),
-
-            # Page elements
-            'load_summernote': (
-                action.action_type == models.Action.PERSONALIZED_TEXT
-                or action.action_type == models.Action.EMAIL_REPORT
-                or action.action_type == models.Action.RUBRIC_TEXT
+                cond.n_rows_selected == 0 for cond in action.conditions.all()
             ),
+            'rows_all_false': action.get_row_all_false_count(),
+            'load_summernote': action.action_type
+            in [
+                models.Action.PERSONALIZED_TEXT,
+                models.Action.EMAIL_REPORT,
+                models.Action.RUBRIC_TEXT,
+            ],
             'query_builder_ops': action.workflow.get_query_builder_ops_as_str(),
-            'vis_scripts': PlotlyHandler.get_engine_scripts()}
+            'vis_scripts': PlotlyHandler.get_engine_scripts(),
+        }
 
 
 class ActionOutEditManager(ActionEditManager):

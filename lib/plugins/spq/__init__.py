@@ -33,10 +33,10 @@ def spq_encode(answers):
     ss_idx = [4, 8, 12, 16, 20]
 
     # Calculate the four accumulations first
-    dm_val = 1.0 * sum([answers[i - 1] for i in dm_idx])
-    ds_val = 1.0 * sum([answers[i - 1] for i in ds_idx])
-    sm_val = 1.0 * sum([answers[i - 1] for i in sm_idx])
-    ss_val = 1.0 * sum([answers[i - 1] for i in ss_idx])
+    dm_val = 1.0 * sum(answers[i - 1] for i in dm_idx)
+    ds_val = 1.0 * sum(answers[i - 1] for i in ds_idx)
+    sm_val = 1.0 * sum(answers[i - 1] for i in sm_idx)
+    ss_val = 1.0 * sum(answers[i - 1] for i in ss_idx)
 
     # Return the six values
     return ((dm_val + ds_val) / (len(dm_idx) + len(ds_idx)),

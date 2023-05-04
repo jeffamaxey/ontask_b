@@ -123,7 +123,5 @@ class SQLConnection(Connection):
             'db_user': self.db_user,
             'db_password': 'SECRET' if self.db_password else '',
             'db_table': self.db_table,
-        }
-
-        payload.update(kwargs)
+        } | kwargs
         return Log.objects.register(user, operation_type, None, payload)

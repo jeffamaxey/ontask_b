@@ -4,11 +4,11 @@ from django.core.exceptions import PermissionDenied
 def is_allowed(request, allowed_roles, raise_exception):
     # allowed_roles can either be a string (for just one)
     # or a tuple or list (for several)
-    if not isinstance(allowed_roles, (list, tuple)):
-        allowed = (allowed_roles, )
-    else:
-        allowed = allowed_roles
-
+    allowed = (
+        allowed_roles
+        if isinstance(allowed_roles, (list, tuple))
+        else (allowed_roles,)
+    )
     if not getattr(request, 'LTI', None):
         raise PermissionDenied
 

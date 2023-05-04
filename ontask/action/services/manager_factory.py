@@ -34,13 +34,13 @@ class ActionManagementFactory:
         :return: HttpResponse
         """
         try:
-            runner_obj = self._runners.get(action.action_type)
-            if not runner_obj:
+            if runner_obj := self._runners.get(action.action_type):
+                return runner_obj.process_edit_request(
+                    request,
+                    workflow,
+                    action)
+            else:
                 raise ValueError(action.action_type)
-            return runner_obj.process_edit_request(
-                request,
-                workflow,
-                action)
         except ValueError:
             return render(request, 'base.html', {})
 
@@ -52,10 +52,10 @@ class ActionManagementFactory:
         :return: HttpResponse
         """
         try:
-            runner_obj = self._runners.get(action_type)
-            if not runner_obj:
+            if runner_obj := self._runners.get(action_type):
+                return runner_obj.process_run_request(action_type, **kwargs)
+            else:
                 raise ValueError(action_type)
-            return runner_obj.process_run_request(action_type, **kwargs)
         except ValueError:
             return render(kwargs.get('request'), 'base.html', {})
 
@@ -67,10 +67,10 @@ class ActionManagementFactory:
         :return: HttpResponse
         """
         try:
-            runner_obj = self._runners.get(action_type)
-            if not runner_obj:
+            if runner_obj := self._runners.get(action_type):
+                return runner_obj.process_run_request_done(**kwargs)
+            else:
                 raise ValueError(action_type)
-            return runner_obj.process_run_request_done(**kwargs)
         except ValueError:
             return render(kwargs.get('request'), 'base.html', {})
 

@@ -37,9 +37,7 @@ def edit_rubric_cell(
     :return: JSON Response
     """
     del workflow
-    # If the request has the 'action_content', update the action
-    action_content = request.POST.get('action_content')
-    if action_content:
+    if action_content := request.POST.get('action_content'):
         action.set_text_content(action_content)
 
     form = forms.RubricCellForm(
@@ -90,9 +88,7 @@ def edit_rubric_loas(
     :return: JSON Response
     """
     del workflow
-    # If the request has the 'action_content', update the action
-    action_content = request.POST.get('action_content')
-    if action_content:
+    if action_content := request.POST.get('action_content'):
         action.set_text_content(action_content)
 
     form = forms.RubricLOAForm(

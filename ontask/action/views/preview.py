@@ -85,17 +85,15 @@ def preview_response(
     :return: http.JsonResponse
     """
     del pk, workflow
-    # If the request has the 'action_content', update the action
-    action_content = request.POST.get('action_content')
-    if action_content:
+    if action_content := request.POST.get('action_content'):
         action.set_text_content(action_content)
 
     # Initial context to render the response page.
     context = {'action': action, 'index': idx}
-    if (
-        action.action_type == models.Action.EMAIL_REPORT
-        or action.action_type == models.Action.JSON_REPORT
-    ):
+    if action.action_type in [
+        models.Action.EMAIL_REPORT,
+        models.Action.JSON_REPORT,
+    ]:
         services.create_list_preview_context(action, context)
     else:
         services.create_row_preview_context(

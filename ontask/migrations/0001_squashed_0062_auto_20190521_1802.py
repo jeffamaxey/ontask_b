@@ -101,10 +101,7 @@ def change_action_type(apps, schema_editor):
 
     Action = apps.get_model('ontask', 'Action')
     for item in Action.objects.all():
-        if item.is_out:
-            item.action_type = 'personal_text'
-        else:
-            item.action_type = 'survey'
+        item.action_type = 'personal_text' if item.is_out else 'survey'
         item.save()
 
 

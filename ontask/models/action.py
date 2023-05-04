@@ -169,10 +169,7 @@ class ActionBase(NameAndDescription, CreateModifyFields):
     def get_rows_selected(self):
         """Get the number of rows in table selected for this action."""
         action_filter = self.get_filter()
-        if not action_filter:
-            return self.workflow.nrows
-
-        return action_filter.n_rows_selected
+        return action_filter.n_rows_selected if action_filter else self.workflow.nrows
 
     def get_row_all_false_count(self):
         """Extract the rows for which  all conditions are false.
@@ -299,11 +296,10 @@ class ActionDataOut(ActionBase):  # noqa Z214
     @property
     def has_html_text(self) -> bool:
         """Check if the action has HTML text."""
-        return (
-            self.text_content
-            and (
-                self.action_type == self.PERSONALIZED_TEXT
-                or self.action_type == self.EMAIL_REPORT))
+        return self.text_content and self.action_type in [
+            self.PERSONALIZED_TEXT,
+            self.EMAIL_REPORT,
+        ]
 
     def rename_variable(self, old_name: str, new_name: str) -> None:
         """Rename a variable present in the action content.
@@ -416,23 +412,29 @@ class ActionDataOut(ActionBase):  # noqa Z214
         # Columns from {{ colname }} in text content
         for match in VAR_USE_RES[0].finditer(self.text_content):
             var_name = match.group('vname')
-            column = self.workflow.columns.filter(name=var_name).first()
-            if column:
+            if column := self.workflow.columns.filter(name=var_name).first():
                 column_list.append(column)
         # Columns from {% ot_insert_report "c1" "c2" %}
         for match in VAR_USE_RES[2].finditer(self.text_content):
-            column_list.extend([
-                col for col in self.workflow.columns.filter(
-                    name__in=shlex.split(match.group('args')))])
+            column_list.extend(
+                list(
+                    self.workflow.columns.filter(
+                        name__in=shlex.split(match.group('args'))
+                    )
+                )
+            )
 
         # Columns from the attachment
         for attachment in self.attachments.all():
-            column_list.extend([col for col in attachment.columns.all()])
-            attachment_formula = attachment.formula
-            if attachment_formula:
-                column_list.extend([
-                    col for col in self.workflow.columns.filter(
-                        name__in=formula.get_variables(attachment_formula))])
+            column_list.extend(list(attachment.columns.all()))
+            if attachment_formula := attachment.formula:
+                column_list.extend(
+                    list(
+                        self.workflow.columns.filter(
+                            name__in=formula.get_variables(attachment_formula)
+                        )
+                    )
+                )
 
         return list(set(column_list))
 
@@ -516,7 +518,7 @@ class Action(ActionDataOut, ActionDataIn):
         if self.target_url:
             payload['target_url'] = self.target_url
 
-        payload.update(kwargs)
+        payload |= kwargs
         return Log.objects.register(
             user,
             operation_type,

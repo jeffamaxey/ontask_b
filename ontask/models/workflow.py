@@ -275,13 +275,7 @@ class Workflow(NameAndDescription, CreateModifyFields):
             return False
 
         session = Session.objects.filter(session_key=self.session_key).first()
-        if not session:
-            # Session does not exist, then it is not locked
-            return False
-
-        # Session is in the workflow and in the session table. Locked if expire
-        # date is beyond the current time.
-        return session.expire_date >= timezone.now()
+        return session.expire_date >= timezone.now() if session else False
 
     def lock(
         self,
@@ -456,9 +450,8 @@ class Workflow(NameAndDescription, CreateModifyFields):
             'name': self.name,
             'ncols': self.ncols,
             'nrows': self.nrows,
-            'star': self.user in self.star.all()}
-
-        payload.update(kwargs)
+            'star': self.user in self.star.all(),
+        } | kwargs
         return Log.objects.register(user, operation_type, self, payload)
 
     class Meta:

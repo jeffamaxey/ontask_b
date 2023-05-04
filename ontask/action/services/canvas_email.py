@@ -169,11 +169,10 @@ def _send_single_canvas_message(
         headers=headers)
     response_status = response.status_code
 
-    req_rejected = (
+    if req_rejected := (
         response.status_code == status.HTTP_401_UNAUTHORIZED
         and response.headers.get('WWW-Authenticate')
-    )
-    if req_rejected:
+    ):
         result_msg, response_status = _refresh_and_retry_send(
             oauth_info,
             conversation_url,
@@ -288,14 +287,12 @@ class ActionManagerCanvasEmail(ActionOutEditManager, ActionRunManager):
         # Create the context for the log events
         context = {'action': action.id}
 
-        # Send the objects to the given URL
-        idx = 1
         burst = oauth_info['aux_params'].get('burst')
         burst_pause = oauth_info['aux_params'].get('pause', 0)
         domain = oauth_info['domain_port']
         conversation_url = oauth_info['conversation_url'].format(domain)
         to_emails = []
-        for msg_body, msg_subject, msg_to in action_evals:
+        for idx, (msg_body, msg_subject, msg_to) in enumerate(action_evals, start=1):
             # JSON object to send. Taken from method.conversations.create in
             # https://canvas.instructure.com/doc/api/conversations.html
             canvas_email_payload = {
@@ -307,9 +304,6 @@ class ActionManagerCanvasEmail(ActionOutEditManager, ActionRunManager):
 
             # Manage the bursts
             _do_burst_pause(burst, burst_pause, idx)
-            # Index to detect bursts
-            idx += 1
-
             # Send the email
             result_msg, response_status = _send_single_canvas_message(
                 conversation_url,

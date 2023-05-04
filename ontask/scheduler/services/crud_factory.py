@@ -23,10 +23,10 @@ class SchedulerCRUDFactory:
 
     def _get_creator(self, operation_type):
         """Get the creator for the tiven operation_type and args."""
-        creator_obj = self._producers.get(operation_type)
-        if not creator_obj:
+        if creator_obj := self._producers.get(operation_type):
+            return creator_obj
+        else:
             raise ValueError(operation_type)
-        return creator_obj
 
     def register_producer(self, operation_type: str, saver_obj):
         """Register the given object that will perform the save operation."""

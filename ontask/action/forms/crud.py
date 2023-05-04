@@ -37,11 +37,13 @@ class ActionUpdateForm(forms.ModelForm):
         """Verify that the name is not taken."""
         form_data = super().clean()
 
-        # Check if the name already exists
-        name_exists = self.workflow.actions.filter(
-            name=self.data['name'],
-        ).exclude(id=self.instance.id).exists()
-        if name_exists:
+        if (
+            name_exists := self.workflow.actions.filter(
+                name=self.data['name'],
+            )
+            .exclude(id=self.instance.id)
+            .exists()
+        ):
             self.add_error(
                 'name',
                 _('There is already an action with this name.'),
@@ -64,9 +66,7 @@ class ActionForm(ActionUpdateForm):
         super().__init__(*args, **kargs)
 
         at_field = self.fields['action_type']
-        at_field.widget.choices = [
-            (key, value)
-            for key, value in models.Action.AVAILABLE_ACTION_TYPES.items()]
+        at_field.widget.choices = list(models.Action.AVAILABLE_ACTION_TYPES.items())
 
         if len(models.Action.AVAILABLE_ACTION_TYPES) == 1:
             # There is only one type of action. No need to generate the field.

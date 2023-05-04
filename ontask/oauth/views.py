@@ -33,16 +33,13 @@ def callback(request: WSGIRequest) -> http.HttpResponse:
             _('Incorrect Canvas callback invocation.'))
         return redirect('action:index')
 
-    # Check first if there has been some error
-    error_string = request.GET.get('error')
-    if error_string:
+    if error_string := request.GET.get('error'):
         messages.error(
             request,
             ugettext('Error in OAuth2 step 1 ({0})').format(error_string))
         return redirect('action:index')
 
-    status = services.process_callback(request, payload)
-    if status:
+    if status := services.process_callback(request, payload):
         messages.error(request, status)
         return redirect('action:index')
 

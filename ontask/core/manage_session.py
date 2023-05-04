@@ -27,8 +27,7 @@ class SessionPayload(collections.MutableMapping):
         super().__init__()
         self.__store = {}
         if session:
-            in_session = session.get(PAYLOAD_SESSION_DICTIONARY)
-            if in_session:
+            if in_session := session.get(PAYLOAD_SESSION_DICTIONARY):
                 self.__store = in_session
 
         if initial_values:

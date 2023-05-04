@@ -82,14 +82,12 @@ def evaluate(
         return ''
 
     if len(sub_clauses) > 1:
-        result_txt = '(' + join_str.join(
-            [sub_c for sub_c in sub_clauses],
-        ) + ')'
+        result_txt = f'({join_str.join(list(sub_clauses))})'
     else:
         result_txt = sub_clauses[0]
 
     if node.get('not') is True:
-        result_txt = 'NOT (' + result_txt + ')'
+        result_txt = f'NOT ({result_txt})'
 
     return result_txt
 

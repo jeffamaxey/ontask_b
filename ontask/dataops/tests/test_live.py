@@ -69,7 +69,7 @@ class DataopsSymbols(tests.OnTaskLiveTestCase):
         # Click again in the name and introduce something different
         self.selenium.find_element_by_id("id_name").click()
         self.selenium.find_element_by_id("id_name").clear()
-        self.selenium.find_element_by_id("id_name").send_keys(symbols + '2')
+        self.selenium.find_element_by_id("id_name").send_keys(f'{symbols}2')
 
         # Save the new column
         self.selenium.find_element_by_xpath("//button[@type='submit']").click()
@@ -92,14 +92,14 @@ class DataopsSymbols(tests.OnTaskLiveTestCase):
         self.wait_for_page(element_id='workflow-detail')
 
         # Add a new attribute and insert key (symbols) and value
-        self.create_attribute(symbols + '3', 'vvv')
+        self.create_attribute(f'{symbols}3', 'vvv')
 
         # Click in the TABLE link
         self.go_to_table()
 
         # Verify that everything appears normally
         self.assertIn(escape(symbols), self.selenium.page_source)
-        self.assertIn(escape(symbols + '2'), self.selenium.page_source)
+        self.assertIn(escape(f'{symbols}2'), self.selenium.page_source)
 
         # Click in the Actions navigation menu
         self.go_to_actions()
@@ -154,18 +154,15 @@ class DataopsSymbols(tests.OnTaskLiveTestCase):
         # Enter data using the RUN menu. Select one entry to populate
         self.selenium.find_element_by_link_text("student01@bogus.com").click()
         self.wait_for_page(element_id='action-row-datainput')
-        field = self.selenium.find_element_by_id(
-            'id_' + ONTASK_UPLOAD_FIELD_PREFIX + '1')
+        field = self.selenium.find_element_by_id(f'id_{ONTASK_UPLOAD_FIELD_PREFIX}1')
         field.click()
         field.clear()
         field.send_keys('17')
-        field = self.selenium.find_element_by_id(
-            'id_' + ONTASK_UPLOAD_FIELD_PREFIX + '2')
+        field = self.selenium.find_element_by_id(f'id_{ONTASK_UPLOAD_FIELD_PREFIX}2')
         field.click()
         field.clear()
         field.send_keys('Carmelo Coton2')
-        field = self.selenium.find_element_by_id(
-            'id_' + ONTASK_UPLOAD_FIELD_PREFIX + '3')
+        field = self.selenium.find_element_by_id(f'id_{ONTASK_UPLOAD_FIELD_PREFIX}3')
         field.click()
         field.clear()
         field.send_keys('xxx')
@@ -194,25 +191,19 @@ class DataopsSymbols(tests.OnTaskLiveTestCase):
         self.selenium.find_element_by_class_name('note-editable').click()
 
         # Insert attribute
-        self.click_dropdown_option(
-            "//div[@id='attribute-selector']",
-            symbols + '3')
+        self.click_dropdown_option("//div[@id='attribute-selector']", f'{symbols}3')
 
         # Insert column name
         self.click_dropdown_option("//div[@id='column-selector']", symbols)
 
         # Insert second column name
-        self.click_dropdown_option(
-            "//div[@id='column-selector']",
-            symbols + '2')
+        self.click_dropdown_option("//div[@id='column-selector']", f'{symbols}2')
 
         # Create new condition
-        self.create_condition(symbols + "4",
-            '',
-            [(symbols, "begins with", "C")])
+        self.create_condition(f"{symbols}4", '', [(symbols, "begins with", "C")])
 
         # Create the filter
-        self.create_filter('', [(symbols + "2", "doesn't begin with", "x")])
+        self.create_filter('', [(f"{symbols}2", "doesn't begin with", "x")])
 
         # Click the preview button
         self.select_text_tab()
@@ -287,8 +278,9 @@ class DataopsSymbols(tests.OnTaskLiveTestCase):
         # Set the correct values for an action-in
         # Set the right columns to process
         self.select_parameters_tab()
-        self.click_dropdown_option("//div[@id='select-key-column-name']",
-            'email' + symbols)
+        self.click_dropdown_option(
+            "//div[@id='select-key-column-name']", f'email{symbols}'
+        )
         # This wait is incorrect. Don't know how to wait for an AJAX call.
         WebDriverWait(self.selenium, 10).until_not(
             EC.visibility_of_element_located((By.ID, 'div-spinner'))
@@ -306,8 +298,7 @@ class DataopsSymbols(tests.OnTaskLiveTestCase):
         self.selenium.find_element_by_link_text("student01@bogus.com").click()
 
         # Modify the value of the column
-        field = self.selenium.find_element_by_id(
-            'id_' + ONTASK_UPLOAD_FIELD_PREFIX + '1')
+        field = self.selenium.find_element_by_id(f'id_{ONTASK_UPLOAD_FIELD_PREFIX}1')
         field.click()
         field.clear()
         field.send_keys('14')
@@ -322,8 +313,7 @@ class DataopsSymbols(tests.OnTaskLiveTestCase):
         self.selenium.find_element_by_link_text("student02@bogus.com").click()
 
         # Modify the value of the columne
-        field = self.selenium.find_element_by_id(
-            'id_' + ONTASK_UPLOAD_FIELD_PREFIX + '1')
+        field = self.selenium.find_element_by_id(f'id_{ONTASK_UPLOAD_FIELD_PREFIX}1')
         field.click()
         field.clear()
         field.send_keys('15')
@@ -338,8 +328,7 @@ class DataopsSymbols(tests.OnTaskLiveTestCase):
         self.selenium.find_element_by_link_text("student03@bogus.com").click()
 
         # Modify the value of the column
-        field = self.selenium.find_element_by_id(
-            'id_' + ONTASK_UPLOAD_FIELD_PREFIX + '1')
+        field = self.selenium.find_element_by_id(f'id_{ONTASK_UPLOAD_FIELD_PREFIX}1')
         field.click()
         field.clear()
         field.send_keys('16')
@@ -622,8 +611,8 @@ class DataopsPluginExecution(tests.OnTaskLiveTestCase):
                 wflow.get_data_frame_table_name(),
                 'RESULT 2'))
         df = pandas.load_table(wflow.get_data_frame_table_name())
-        self.assertTrue(all([x == 1 for x in df['RESULT 1']]))
-        self.assertTrue(all([x == 2 for x in df['RESULT 2']]))
+        self.assertTrue(all(x == 1 for x in df['RESULT 1']))
+        self.assertTrue(all(x == 2 for x in df['RESULT 2']))
 
         # Second execution, this time adding a suffix to the column
         self.go_to_actions()
@@ -695,8 +684,8 @@ class DataopsPluginExecution(tests.OnTaskLiveTestCase):
                 wflow.get_data_frame_table_name(),
                 'RESULT 2_2'))
         df = pandas.load_table(wflow.get_data_frame_table_name())
-        self.assertTrue(all([x == 1 for x in df['RESULT 1_2']]))
-        self.assertTrue(all([x == 2 for x in df['RESULT 2_2']]))
+        self.assertTrue(all(x == 1 for x in df['RESULT 1_2']))
+        self.assertTrue(all(x == 2 for x in df['RESULT 2_2']))
 
         # End of session
         self.logout()

@@ -691,18 +691,16 @@ class TutorialCaptures(ScreenTests):
         topics = [x.strip() for x in question_values.split(',')]
         for topic in topics:
             self.create_condition(
-                topic[0:4].strip() + ' - Fail',
+                f'{topic[:4].strip()} - Fail',
                 '',
-                [('Survey Q1', 'equal', topic),
-                 ('Total', 'less', 50)]
+                [('Survey Q1', 'equal', topic), ('Total', 'less', 50)],
             )
         # Create the conditions for those that passed the exam
         for topic in topics:
             self.create_condition(
-                topic[0:4].strip() + ' - Passed',
+                f'{topic[:4].strip()} - Passed',
                 '',
-                [('Survey Q1', 'equal', topic),
-                 ('Total', 'greater or equal', 50)]
+                [('Survey Q1', 'equal', topic), ('Total', 'greater or equal', 50)],
             )
 
         # Action editor
@@ -716,17 +714,19 @@ class TutorialCaptures(ScreenTests):
         # Add the text for those that failed
         for topic in topics:
             self.selenium.find_element_by_class_name('note-editable').send_keys(
-                ('{{% if {0} - Fail %}} Tips about {0} ' +
-                 'for those that failed.{{% endif %}}\n').format(
-                    topic[0:4].strip())
+                (
+                    '{{% if {0} - Fail %}} Tips about {0} '
+                    + 'for those that failed.{{% endif %}}\n'
+                ).format(topic[:4].strip())
             )
 
         # Add the text for those that passed
         for topic in topics:
             self.selenium.find_element_by_class_name('note-editable').send_keys(
-                ('{{% if {0} - Passed %}}Tips about {0} ' +
-                 'for those that passed.{{% endif %}}\n').format(
-                    topic[0:4].strip())
+                (
+                    '{{% if {0} - Passed %}}Tips about {0} '
+                    + 'for those that passed.{{% endif %}}\n'
+                ).format(topic[:4].strip())
             )
 
         self.selenium.find_element_by_class_name('note-editable').send_keys(

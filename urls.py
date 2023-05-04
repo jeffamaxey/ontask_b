@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """First entry point to define URLs."""
+
 from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls.i18n import i18n_patterns
@@ -96,12 +97,11 @@ urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += i18n_patterns(
     path(
         'jsi18n',
-        cache_page(
-            86400,
-            key_prefix='js18n-%s' % ontask_version())(
-            JavaScriptCatalog.as_view()),
+        cache_page(86400, key_prefix=f'js18n-{ontask_version()}')(
+            JavaScriptCatalog.as_view()
+        ),
         name='javascript-catalog',
-    ),
+    )
 )
 
 # Include django debug toolbar if DEBUG is ons

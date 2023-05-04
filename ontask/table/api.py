@@ -271,14 +271,9 @@ class TableBasicMerge(APIView):
         how = serializer.validated_data['how']
         left_on = serializer.validated_data['left_on']
         right_on = serializer.validated_data['right_on']
-        error = pandas.validate_merge_parameters(
-            dst_df,
-            src_df,
-            how,
-            left_on,
-            right_on)
-
-        if error:
+        if error := pandas.validate_merge_parameters(
+            dst_df, src_df, how, left_on, right_on
+        ):
             raise APIException(error)
 
         # Ready to perform the MERGE

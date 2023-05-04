@@ -24,7 +24,7 @@ class LTIAuthMiddleware:
 
     def process_request(self, request):
         if settings.DEBUG:
-            LOGGER.debug('inside process_request %s' % request.path)
+            LOGGER.debug(f'inside process_request {request.path}')
 
         # AuthenticationMiddleware is required so that request.user exists.
         if not getattr(request, 'user', None):
@@ -57,7 +57,7 @@ class LTIAuthMiddleware:
                 with Timer() as t:
                     auth.login(request, user)
 
-                LOGGER.debug('login() took %s s' % t.secs)
+                LOGGER.debug(f'login() took {t.secs} s')
 
                 lti_launch = {
                     'context_id': request.POST.get('context_id'),

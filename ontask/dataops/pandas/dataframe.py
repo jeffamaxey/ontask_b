@@ -97,8 +97,9 @@ def _verify_dataframe_columns(
 
         # Condition 3: If there are categories, the new values should be
         # compatible with them.
-        if col.categories and not all(
-            row_val in col.get_categories() for row_val in data_frame[col.name]
+        if col.categories and any(
+            row_val not in col.get_categories()
+            for row_val in data_frame[col.name]
             if row_val and not pd.isnull(row_val)
         ):
             raise Exception(gettext(
@@ -281,10 +282,7 @@ def get_table_row_by_index(
         filter_formula=filter_formula)
 
     # If the data is not there, return None
-    if idx > df_data.rowcount:
-        return None
-
-    return df_data.fetchall()[idx - 1]
+    return None if idx > df_data.rowcount else df_data.fetchall()[idx - 1]
 
 
 def add_column_to_df(
@@ -309,9 +307,7 @@ def add_column_to_df(
         # Choose the right numpy type
         if column_type == 'string':
             initial_value = None
-        elif column_type == 'integer' or column_type == 'double':
-            initial_value = np.nan
-        elif column_type == 'boolean':
+        elif column_type in ['integer', 'double', 'boolean']:
             initial_value = np.nan
         elif column_type == 'datetime':
             initial_value = pd.NaT

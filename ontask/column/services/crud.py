@@ -180,9 +180,7 @@ def add_random_column(
     new_column = [None] * workflow.nrows
     categories = column.get_categories()
     # Create the random partitions
-    partitions = _partition(
-        [idx for idx in range(workflow.nrows)],
-        len(categories))
+    partitions = _partition(list(range(workflow.nrows)), len(categories))
 
     # Assign values to partitions
     for idx, indexes in enumerate(partitions):

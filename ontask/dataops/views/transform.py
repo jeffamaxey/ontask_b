@@ -118,15 +118,23 @@ def plugin_invoke(
         context={
             'form': form,
             'input_column_fields': [
-                fld for fld in list(form)
-                if fld.name.startswith(ONTASK_UPLOAD_FIELD_PREFIX + 'input')],
+                fld
+                for fld in list(form)
+                if fld.name.startswith(f'{ONTASK_UPLOAD_FIELD_PREFIX}input')
+            ],
             'output_column_fields': [
-                fld for fld in list(form)
-                if fld.name.startswith(ONTASK_UPLOAD_FIELD_PREFIX + 'output')],
+                fld
+                for fld in list(form)
+                if fld.name.startswith(f'{ONTASK_UPLOAD_FIELD_PREFIX}output')
+            ],
             'parameters': [
-                fld for fld in list(form)
+                fld
+                for fld in list(form)
                 if fld.name.startswith(
-                    ONTASK_UPLOAD_FIELD_PREFIX + 'parameter')],
+                    f'{ONTASK_UPLOAD_FIELD_PREFIX}parameter'
+                )
+            ],
             'pinstance': plugin_instance,
             'id': workflow.id,
-        })
+        },
+    )

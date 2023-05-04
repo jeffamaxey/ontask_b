@@ -56,7 +56,7 @@ def attribute_edit(
     keys = sorted(workflow.attributes.keys())
 
     # Get the key/value pair
-    key = keys[int(pk)]
+    key = keys[pk]
     attr_value = workflow.attributes[key]
 
     # Remove the one being edited
@@ -71,8 +71,10 @@ def attribute_edit(
             key=key,
             value=attr_value,
             keys=keys,
-            workflow=workflow),
-        int(pk))
+            workflow=workflow,
+        ),
+        pk,
+    )
 
 
 @user_passes_test(is_instructor)
@@ -92,7 +94,7 @@ def attribute_delete(
     :return: JSON REsponse
     """
     wf_attributes = workflow.attributes
-    key = sorted(wf_attributes.keys())[int(pk)]
+    key = sorted(wf_attributes.keys())[pk]
 
     if request.method == 'POST':
         wf_attributes.pop(key, None)

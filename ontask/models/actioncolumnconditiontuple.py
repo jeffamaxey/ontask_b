@@ -70,7 +70,7 @@ class ActionColumnConditionTuple(models.Model):
         if self.condition:
             payload['condition'] = self.condition.name
 
-        payload.update(kwargs)
+        payload |= kwargs
         return Log.objects.register(
             user,
             operation_type,

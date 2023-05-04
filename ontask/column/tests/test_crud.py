@@ -101,16 +101,18 @@ class WorkflowTestViewColumnCrud(tests.OnTaskTestCase):
             {'pk': column.id},
             method='POST',
             req_params={
-                'name': column.name + '2',
+                'name': f'{column.name}2',
                 'description_text': column.description_text,
                 'data_type': column.data_type,
                 'position': column.position,
-                'raw_categories': column.categories},
-            is_ajax=True)
+                'raw_categories': column.categories,
+            },
+            is_ajax=True,
+        )
         self.assertTrue(status.is_success(resp.status_code))
 
         column.refresh_from_db()
-        self.assertEqual(column.name, old_name + '2')
+        self.assertEqual(column.name, f'{old_name}2')
 
     def test_formula_column_add(self):
         """Test adding a formula column."""

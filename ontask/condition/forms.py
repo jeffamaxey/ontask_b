@@ -56,15 +56,16 @@ class ConditionForm(FilterForm):
             self.add_error('name', _('Name cannot be empty'))
             return form_data
 
-        msg = is_legal_name(form_data['name'])
-        if msg:
+        if msg := is_legal_name(form_data['name']):
             self.add_error('name', msg)
 
-        # Check if the name already exists
-        name_exists = self.action.conditions.filter(
-            name=name,
-        ).exclude(id=self.instance.id).exists()
-        if name_exists:
+        if (
+            name_exists := self.action.conditions.filter(
+                name=name,
+            )
+            .exclude(id=self.instance.id)
+            .exists()
+        ):
             self.add_error(
                 'name',
                 _('There is already a condition with this name.'),

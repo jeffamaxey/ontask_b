@@ -38,9 +38,7 @@ def save_text(
     if action.is_in:
         return http.JsonResponse({'html_redirect': reverse('home')})
 
-    # If the request has the 'action_content', update the action
-    action_content = request.POST.get('action_content')
-    if action_content:
+    if action_content := request.POST.get('action_content'):
         action.set_text_content(action_content)
 
     return http.JsonResponse({'html_redirect': ''})
@@ -127,9 +125,7 @@ def add_attachment(
     if not action or action.action_type != models.Action.EMAIL_REPORT:
         return http.JsonResponse({'html_rediret': reverse('action:index')})
 
-    # If the request has 'action_content', update the action
-    action_content = request.POST.get('action_content')
-    if action_content:
+    if action_content := request.POST.get('action_content'):
         action.set_text_content(action_content)
 
     action.attachments.add(view)
@@ -169,9 +165,7 @@ def remove_attachment(
     if not action or action.action_type != models.Action.EMAIL_REPORT:
         return http.JsonResponse({'html_rediret': reverse('action:index')})
 
-    # If the request has 'action_content', update the action
-    action_content = request.POST.get('action_content')
-    if action_content:
+    if action_content := request.POST.get('action_content'):
         action.set_text_content(action_content)
 
     action.attachments.remove(view)

@@ -182,14 +182,9 @@ class ExecuteSQLUpload:
             log_item.save(update_fields=['payload'])
             raise ontask.OnTaskException(msg)
 
-        # Check additional correctness properties in the parameters
-        error = pandas.validate_merge_parameters(
-            dst_df,
-            src_df,
-            how_merge,
-            dst_key,
-            src_key)
-        if error:
+        if error := pandas.validate_merge_parameters(
+            dst_df, src_df, how_merge, dst_key, src_key
+        ):
             log_item.payload['error'] = error
             log_item.save(update_fields=['payload'])
             raise ontask.OnTaskException(error)

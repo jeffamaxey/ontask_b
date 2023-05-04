@@ -138,9 +138,8 @@ class Condition(CreateModifyFields):
             'formula': self.get_formula_text(),
             'n_rows_selected': self.n_rows_selected,
             'is_filter': self.is_filter,
-            'workflow_id': self.action.workflow.id}
-
-        payload.update(kwargs)
+            'workflow_id': self.action.workflow.id,
+        } | kwargs
         return Log.objects.register(
             user,
             operation_type,

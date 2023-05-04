@@ -87,7 +87,7 @@ class OnTaskTestPlugin(OnTaskTransformation):
         # Brief description
         self.description_text = 'Create two columns with constants 1 and 2'
         # Allows the user to provide any non-empty subset of column names
-        self.input_column_names = list()
+        self.input_column_names = []
         # Names of the result columns
         self.output_column_names = ['RESULT 1', 'RESULT 2']
         # Example of how to use the parameters field (not used)

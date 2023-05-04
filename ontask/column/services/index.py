@@ -66,7 +66,7 @@ def column_table_server_side(
             'data_type',
             'is_key'][dt_page.order_col]
         if dt_page.order_dir == 'desc':
-            col_name = '-' + col_name
+            col_name = f'-{col_name}'
         qs = qs.order_by(col_name)
 
     if dt_page.search_value:

@@ -58,17 +58,21 @@ class DataopsTestFormErrorsEmptyWorkflow(tests.OnTaskTestCase):
             'dataops:googlesheetupload_start',
             method='POST',
             req_params={
-                'google_url': 'file://' + filename,
+                'google_url': f'file://{filename}',
                 'skip_lines_at_top': -1,
-                'skip_lines_at_bottom': 0})
+                'skip_lines_at_bottom': 0,
+            },
+        )
         self.assertNotEqual(resp.status_code, status.HTTP_302_FOUND)
         resp = self.get_response(
             'dataops:googlesheetupload_start',
             method='POST',
             req_params={
-                'google_url': 'file://' + filename,
+                'google_url': f'file://{filename}',
                 'skip_lines_at_top': 0,
-                'skip_lines_at_bottom': -1})
+                'skip_lines_at_bottom': -1,
+            },
+        )
         self.assertNotEqual(resp.status_code, status.HTTP_302_FOUND)
 
     def test_s3_upload(self):

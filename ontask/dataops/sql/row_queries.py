@@ -63,11 +63,7 @@ def get_row(
     :return: Dictionary with the row
     """
     key_pair = {key_name: key_value}
-    if filter_pairs:
-        filter_pairs = dict(key_pair, **filter_pairs)
-    else:
-        filter_pairs = key_pair
-
+    filter_pairs = dict(key_pair, **filter_pairs) if filter_pairs else key_pair
     query, fields = get_select_query(
         table_name,
         column_names=column_names,
@@ -146,7 +142,7 @@ def update_row(
                 OnTaskDBIdentifier(key), sql.Placeholder())
             for key in filter_dict.keys()
         ])
-        query_fields += [lit_val for lit_val in filter_dict.values()]
+        query_fields += list(filter_dict.values())
 
     # Execute the query
     with connection.connection.cursor() as cursor:

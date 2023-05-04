@@ -321,7 +321,7 @@ class ConditionInActionIn(tests.OnTaskLiveTestCase):
         self.selenium.find_element_by_link_text('1.0').click()
         WebDriverWait(self.selenium, 10).until(
             EC.element_to_be_clickable(
-                (By.ID, 'id_' + ONTASK_UPLOAD_FIELD_PREFIX + '2')
+                (By.ID, f'id_{ONTASK_UPLOAD_FIELD_PREFIX}2')
             )
         )
 

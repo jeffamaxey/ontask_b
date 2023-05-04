@@ -47,9 +47,7 @@ def clone_condition(
     else:
         action = condition.action
 
-    # If the request has the 'action_content', update the action
-    action_content = request.POST.get('action_content')
-    if action_content:
+    if action_content := request.POST.get('action_content'):
         condition.action.set_text_content(action_content)
 
     condition_services.do_clone_condition(

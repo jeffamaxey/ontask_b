@@ -67,9 +67,8 @@ class Plugin(NameAndDescription, CreateModifyFields):
             'filename': self.filename,
             'is_model': self.is_model,
             'is_verified': self.is_verified,
-            'enabled': self.is_enabled}
-
-        payload.update(kwargs)
+            'enabled': self.is_enabled,
+        } | kwargs
         return Log.objects.register(user, operation_type, None, payload)
 
     class Meta:

@@ -161,7 +161,7 @@ class LTIAuthBackend(ModelBackend):
         if not user.name and username:
             user.name = username
         if not user.name and first_name and last_name:
-            user.name = first_name + ' ' + last_name
+            user.name = f'{first_name} {last_name}'
 
         # check if substring group_role in the user's launch roles
         should_be_in_instructor_group = any(

@@ -72,7 +72,7 @@ class Command(BaseCommand):
                 'A workflow with this name already exists',
             )
 
-        if workflow and options['replace']:
+        if workflow:
             # Remove the workflow before uploading it again
             if options['verbosity']:
                 self.stdout.write(self.style.SUCCESS(

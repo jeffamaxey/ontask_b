@@ -128,7 +128,7 @@ def upload_s2(
     newname_fields = [
         ffield for ffield in form if ffield.name.startswith('new_name_')]
     src_key_fields = [
-        form['make_key_%s' % idx] if src_is_key_column[idx] else None
+        form[f'make_key_{idx}'] if src_is_key_column[idx] else None
         for idx in range(len(src_is_key_column))
     ]
 

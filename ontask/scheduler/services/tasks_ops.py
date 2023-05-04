@@ -23,14 +23,10 @@ def schedule_task(s_item: models.ScheduledOperation):
 
     If the s_item status is not PENDING, no new task is created.
     """
-    enabled = True
-    if s_item.task:
-        # Preserve the enabled flag in the old task, otherwise is reset
-        enabled = s_item.task.enabled
+    enabled = s_item.task.enabled if s_item.task else True
     s_item.delete_task()
 
-    msg = s_item.are_times_valid()
-    if msg:
+    if msg := s_item.are_times_valid():
         raise errors.OnTaskScheduleIncorrectTimes(msg)
 
     # Case of a single execution in the future

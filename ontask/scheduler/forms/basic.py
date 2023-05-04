@@ -85,13 +85,11 @@ class ScheduleBasicForm(ontask_forms.FormWithPayload, forms.ModelForm):
                 'name',
                 str(_('There is an operation scheduled with this name')))
 
-        # The executed times must be correct
-        diagnostic_msg = models.ScheduledOperation.validate_times(
+        if diagnostic_msg := models.ScheduledOperation.validate_times(
             self.cleaned_data.get('execute'),
             self.cleaned_data.get('frequency'),
-            self.cleaned_data.get('execute_until'))
-
-        if diagnostic_msg:
+            self.cleaned_data.get('execute_until'),
+        ):
             self.add_error(None, diagnostic_msg)
 
         return form_data

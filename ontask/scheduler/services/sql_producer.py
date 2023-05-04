@@ -40,8 +40,7 @@ class ScheduledOperationSaveSQLUpload(ScheduledOperationSaveBase):
                 'valuerange': [],
                 'page_title': ugettext('Schedule SQL Upload')})
 
-        s_item = kwargs.get('schedule_item')
-        if s_item:
+        if s_item := kwargs.get('schedule_item'):
             payload.update(s_item.payload)
             payload['schedule_id'] = s_item.id
             payload['connection_id'] = s_item.payload['connection_id']
@@ -78,8 +77,7 @@ class ScheduledOperationSaveSQLUpload(ScheduledOperationSaveBase):
         previous requests.
         :return: Http Response
         """
-        s_item_id = payload.pop('schedule_id', None)
-        if s_item_id:
+        if s_item_id := payload.pop('schedule_id', None):
             # Get the item being processed
             if not schedule_item:
                 schedule_item = models.ScheduledOperation.objects.filter(

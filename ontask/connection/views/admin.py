@@ -65,16 +65,21 @@ def sql_connection_view(
     :return: AJAX response
     """
     c_obj = models.SQLConnection.objects.filter(pk=pk).first()
-    if not c_obj:
-        # Connection object not found, go to table of Athena connections
-        return http.JsonResponse({
-            'html_redirect': reverse('connection:sqlconns_admin_index')})
-
-    return http.JsonResponse({
-        'html_form': render_to_string(
-            'connection/includes/partial_show.html',
-            {'c_vals': c_obj.get_display_dict(), 'id': c_obj.id},
-            request=request)})
+    return (
+        http.JsonResponse(
+            {
+                'html_form': render_to_string(
+                    'connection/includes/partial_show.html',
+                    {'c_vals': c_obj.get_display_dict(), 'id': c_obj.id},
+                    request=request,
+                )
+            }
+        )
+        if c_obj
+        else http.JsonResponse(
+            {'html_redirect': reverse('connection:sqlconns_admin_index')}
+        )
+    )
 
 
 @user_passes_test(is_instructor)
@@ -90,16 +95,21 @@ def athena_connection_view(
     :return: AJAX response
     """
     c_obj = models.AthenaConnection.objects.filter(pk=pk).first()
-    if not c_obj:
-        # Connection object not found, go to table of Athena connections
-        return http.JsonResponse({
-            'html_redirect': reverse('connnection:athenaconns_admin_index')})
-
-    return http.JsonResponse({
-        'html_form': render_to_string(
-            'connection/includes/partial_show.html',
-            {'c_vals': c_obj.get_display_dict(), 'id': c_obj.id},
-            request=request)})
+    return (
+        http.JsonResponse(
+            {
+                'html_form': render_to_string(
+                    'connection/includes/partial_show.html',
+                    {'c_vals': c_obj.get_display_dict(), 'id': c_obj.id},
+                    request=request,
+                )
+            }
+        )
+        if c_obj
+        else http.JsonResponse(
+            {'html_redirect': reverse('connnection:athenaconns_admin_index')}
+        )
+    )
 
 
 @user_passes_test(is_admin)
@@ -210,15 +220,16 @@ def sql_connection_clone(
     :return: AJAX response
     """
     conn = models.SQLConnection.objects.filter(pk=pk).first()
-    if not conn:
-        # The view is not there. Redirect to workflow detail
-        return http.JsonResponse({'html_redirect': reverse('home')})
-
-    return services.clone_connection(
-        request,
-        conn,
-        models.SQLConnection.objects,
-        reverse('connection:sqlconn_clone', kwargs={'pk': conn.id}))
+    return (
+        services.clone_connection(
+            request,
+            conn,
+            models.SQLConnection.objects,
+            reverse('connection:sqlconn_clone', kwargs={'pk': conn.id}),
+        )
+        if conn
+        else http.JsonResponse({'html_redirect': reverse('home')})
+    )
 
 
 @user_passes_test(is_admin)
@@ -234,15 +245,16 @@ def athena_connection_clone(
     :return: AJAX response
     """
     conn = models.AthenaConnection.objects.filter(pk=pk).first()
-    if not conn:
-        # The view is not there. Redirect to workflow detail
-        return http.JsonResponse({'html_redirect': reverse('home')})
-
-    return services.clone_connection(
-        request,
-        conn,
-        models.AthenaConnection.objects,
-        reverse('dataops:athenaconn_clone', kwargs={'pk': conn.id}))
+    return (
+        services.clone_connection(
+            request,
+            conn,
+            models.AthenaConnection.objects,
+            reverse('dataops:athenaconn_clone', kwargs={'pk': conn.id}),
+        )
+        if conn
+        else http.JsonResponse({'html_redirect': reverse('home')})
+    )
 
 
 @user_passes_test(is_admin)
@@ -258,14 +270,15 @@ def sql_connection_delete(
     :return: AJAX response to handle the form
     """
     conn = models.SQLConnection.objects.filter(pk=pk).first()
-    if not conn:
-        # The view is not there. Redirect to workflow detail
-        return http.JsonResponse({'html_redirect': reverse('home')})
-
-    return services.delete(
-        request,
-        conn,
-        reverse('connection:sqlconn_delete', kwargs={'pk': conn.id}))
+    return (
+        services.delete(
+            request,
+            conn,
+            reverse('connection:sqlconn_delete', kwargs={'pk': conn.id}),
+        )
+        if conn
+        else http.JsonResponse({'html_redirect': reverse('home')})
+    )
 
 
 @user_passes_test(is_admin)
@@ -281,14 +294,15 @@ def athena_connection_delete(
     :return: AJAX response to handle the form
     """
     conn = models.AthenaConnection.objects.filter(pk=pk).first()
-    if not conn:
-        # The view is not there. Redirect to workflow detail
-        return http.JsonResponse({'html_redirect': reverse('home')})
-
-    return services.delete(
-        request,
-        conn,
-        reverse('dataops:athenaconn_delete', kwargs={'pk': conn.id}))
+    return (
+        services.delete(
+            request,
+            conn,
+            reverse('dataops:athenaconn_delete', kwargs={'pk': conn.id}),
+        )
+        if conn
+        else http.JsonResponse({'html_redirect': reverse('home')})
+    )
 
 
 @user_passes_test(is_instructor)

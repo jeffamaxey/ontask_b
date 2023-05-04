@@ -63,9 +63,7 @@ class PluginAvailableTable(tables.Table):
             name=models.Log.PLUGIN_EXECUTE,
             payload__name=record.name,
         ).order_by(F('created').desc()).first()
-        if not log_item:
-            return '--'
-        return log_item.created
+        return log_item.created if log_item else '--'
 
     class Meta:
         """Choose fields, sequence and attributes."""
@@ -124,19 +122,18 @@ def plugin_queue_execution(
     :param run_parameters: Dictionary with all the required parameters
     :return:
     """
-    # If the plugin has no inputs, copy the columns field.
-    input_column_names = run_parameters['input_column_names']
-    if not plugin_instance.input_column_names:
-        input_column_names = [col.name for col in run_parameters['columns']]
-
+    input_column_names = (
+        run_parameters['input_column_names']
+        if plugin_instance.input_column_names
+        else [col.name for col in run_parameters['columns']]
+    )
     # If there are no output columns, clone the input
     output_column_names = run_parameters['output_column_names']
     if not plugin_instance.output_column_names:
         # Plugin instance has an empty set of output files, clone the input
         output_column_names = run_parameters['input_column_names'][:]
 
-    suffix = run_parameters['out_column_suffix']
-    if suffix:
+    if suffix := run_parameters['out_column_suffix']:
         # A suffix has been provided, add it to the list of outputs
         output_column_names = [
             cname + suffix for cname in run_parameters['output_column_names']]

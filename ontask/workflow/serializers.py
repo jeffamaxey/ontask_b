@@ -204,9 +204,8 @@ class WorkflowExportSerializer(serializers.ModelSerializer):
 
         except Exception:
             # Get rid of the objects created
-            if workflow_obj:
-                if workflow_obj.id:
-                    workflow_obj.delete()
+            if workflow_obj and workflow_obj.id:
+                workflow_obj.delete()
             raise
 
         return workflow_obj

@@ -220,8 +220,7 @@ class ActionSerializer(serializers.ModelSerializer):
         :param wflow_columns: All the columns available
         :return: Create the objects and store them in the DB
         """
-        field_data = validated_data.get('columns', [])
-        if field_data:
+        if field_data := validated_data.get('columns', []):
             # Load the columns pointing to the action (if any) LEGACY FIELD!!
             columns = ColumnNameSerializer(
                 data=field_data,

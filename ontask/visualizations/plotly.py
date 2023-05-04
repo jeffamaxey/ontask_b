@@ -75,14 +75,10 @@ class PlotlyBoxPlot(PlotlyHandler):
         for key, value in list(kwargs.pop('context', {}).items()):
             self.format_dict[key] = value
 
-        data = []
-        for column in self.data.columns:
-            data.append(
-                {'y': list(self.data[column].dropna()),
-                 'name': column,
-                 'type': 'box'}
-            )
-
+        data = [
+            {'y': list(self.data[column].dropna()), 'name': column, 'type': 'box'}
+            for column in self.data.columns
+        ]
         # If an individual value has been given, add the annotation and the
         # layout to the rendering.
         if self.format_dict.get('individual_value') is not None:
@@ -101,9 +97,9 @@ class PlotlyBoxPlot(PlotlyHandler):
 
             # Get the two custom values from the given parameters.
             self.layout['annotations'][0]['y'] = \
-                self.format_dict['individual_value']
+                    self.format_dict['individual_value']
             self.layout['annotations'][0]['text'] = \
-                self.format_dict.get('individual_text', _('Your value'))
+                    self.format_dict.get('individual_text', _('Your value'))
 
         # Redefine the layout
         self.format_dict['layout'] = json.dumps(self.layout)
@@ -142,33 +138,23 @@ class PlotlyColumnHistogram(PlotlyHandler):
         for key, value in list(kwargs.pop('context', {}).items()):
             self.format_dict[key] = value
 
-        data = []
         column = self.data.columns[0]
         column_dtype = pandas.datatype_names.get(
             self.data[column].dtype.name)
         data_list = self.data[column].dropna().tolist()
         # Special case for bool and datetime. Turn into strings to be
         # treated as such
-        if (
-            column_dtype == 'boolean' or column_dtype == 'datetime' or
-            column_dtype == 'string'
-        ):
+        if column_dtype in ['boolean', 'datetime', 'string']:
             data_list = [str(x) for x in data_list]
 
-        data.append(
-            {'x': data_list,
-             'histnorm': '',
-             'name': column,
-             'type': 'histogram'}
-        )
-
+        data = [{'x': data_list, 'histnorm': '', 'name': column, 'type': 'histogram'}]
         self.format_dict['data'] = data
 
         # If an individual value has been given, add the annotation and the
         # layout to the rendering.
         if self.format_dict.get('individual_value') is not None:
             ival = self.format_dict['individual_value']
-            if column_dtype == 'boolean' or column_dtype == 'datetime':
+            if column_dtype in ['boolean', 'datetime']:
                 ival = str(ival)
 
             self.layout['annotations'] = [{

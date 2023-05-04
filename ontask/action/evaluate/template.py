@@ -95,7 +95,7 @@ TR_DICT = {
 }
 
 TR_ITEM = make_xlat(TR_DICT)
-RTR_ITEM = make_xlat(dict((val, key) for key, val in TR_DICT.items()))
+RTR_ITEM = make_xlat({val: key for key, val in TR_DICT.items()})
 
 
 def _change_vname(match) -> str:
@@ -111,9 +111,8 @@ def _change_vname(match) -> str:
         args = shlex.split(re_dict['args'])
         return (
             match.group('mup_pre')
-            + ' '.join(['"' + _translate(cname) + '"' for cname in args])
-            + match.group('mup_post')
-        )
+            + ' '.join([f'"{_translate(cname)}"' for cname in args])
+        ) + match.group('mup_post')
 
     return (
         match.group('mup_pre')
@@ -143,9 +142,8 @@ def _change_unescape_vname(match) -> str:
 
         return (
             match.group('mup_pre')
-            + ' '.join(['"' + _translate(cname) + '"' for cname in args])
-            + match.group('mup_post')
-        )
+            + ' '.join([f'"{_translate(cname)}"' for cname in args])
+        ) + match.group('mup_post')
 
     var_name = match.group('vname').replace(
         '&amp;', '&').replace(
@@ -183,8 +181,8 @@ def _translate(varname: str) -> str:
 
     # If the variable name starts with a non-letter or the prefix used to
     # force letter start, add a prefix.
-    if not varname[0] in string.ascii_letters or varname.startswith('OT_'):
-        varname = 'OT_' + varname
+    if varname[0] not in string.ascii_letters or varname.startswith('OT_'):
+        varname = f'OT_{varname}'
 
     # Return the new variable name surrounded by the detected marks.
     return TR_ITEM(varname)
@@ -224,10 +222,10 @@ def render_rubric_criteria(action: models.Action, context: Dict) -> List[List]:
             continue
 
         value_idx = criterion.categories.index(c_value)
-        cell = cells.filter(column=criterion, loa_position=value_idx).first()
-        if not cell:
-            continue
-        text_sources.append([criterion.name, cell.feedback_text])
+        if cell := cells.filter(
+            column=criterion, loa_position=value_idx
+        ).first():
+            text_sources.append([criterion.name, cell.feedback_text])
 
     return text_sources
 

@@ -109,9 +109,7 @@ def create_row_preview_context(
     :param prelude: Optional additional text to include in the preview.
     :return: context is modified to include the appropriate items
     """
-    # Get the total number of items
-    filter_obj = action.get_filter()
-    if filter_obj:
+    if filter_obj := action.get_filter():
         n_items = filter_obj.n_rows_selected
     else:
         n_items = action.workflow.nrows
@@ -167,10 +165,10 @@ def create_row_preview_context(
             '"{0}" = {1}'.format(col.name, row_values[col.name])
             for col in act_vars])
 
-    uses_plain_text = (
-        action.action_type == models.Action.PERSONALIZED_CANVAS_EMAIL
-        or action.action_type == models.Action.PERSONALIZED_JSON
-    )
+    uses_plain_text = action.action_type in [
+        models.Action.PERSONALIZED_CANVAS_EMAIL,
+        models.Action.PERSONALIZED_JSON,
+    ]
     if uses_plain_text:
         action_content = escape(action_content)
 

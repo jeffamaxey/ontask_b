@@ -18,9 +18,9 @@ def _adjust_boolean_operand(node):
         if node['input'] == 'radio':
             node['input'] = 'select'
 
-        if node['value'] == '1' or node['value'] == True:
+        if node['value'] in ['1', True]:
             node['value'] = 'true'
-        elif node['value'] == '0' or node['value'] == False:
+        elif node['value'] in ['0', False]:
             node['value'] = 'false'
         else:
             raise Exception('Incorrect formula found in migration.')

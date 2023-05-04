@@ -87,12 +87,9 @@ class View(NameAndDescription, CreateModifyFields):
             'id': self.id,
             'name': self.name,
             'columns': [col.name for col in self.columns.all()],
-            'formula': formula.evaluate(
-                self.formula,
-                formula.EVAL_TXT),
-            'nrows': self.nrows}
-
-        payload.update(kwargs)
+            'formula': formula.evaluate(self.formula, formula.EVAL_TXT),
+            'nrows': self.nrows,
+        } | kwargs
         return Log.objects.register(
             user,
             operation_type,

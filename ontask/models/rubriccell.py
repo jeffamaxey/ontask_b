@@ -76,9 +76,8 @@ class RubricCell(models.Model):
             'column_id': self.column.id,
             'loa_position': self.loa_position,
             'description': self.description_text,
-            'feedback': self.feedback_text}
-
-        payload.update(kwargs)
+            'feedback': self.feedback_text,
+        } | kwargs
         return Log.objects.register(user, operation_type, None, payload)
 
     class Meta:

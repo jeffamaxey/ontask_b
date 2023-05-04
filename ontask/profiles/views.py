@@ -18,8 +18,7 @@ class ShowProfile(LoginRequiredMixin, generic.TemplateView):
     http_method_names = ['get']
 
     def get(self, request, *args, **kwargs):
-        slug = self.kwargs.get('slug')
-        if slug:
+        if slug := self.kwargs.get('slug'):
             profile = get_object_or_404(models.Profile, slug=slug)
             user = profile.user
         else:
@@ -79,9 +78,7 @@ def reset_token(request):
     :param request:
     :return:
     """
-    tk = Token.objects.filter(user=request.user).first()
-
-    if tk:
+    if tk := Token.objects.filter(user=request.user).first():
         # Delete it if detected.
         tk.delete()
 

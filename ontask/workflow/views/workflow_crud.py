@@ -53,11 +53,11 @@ class WorkflowCreateView(UserIsInstructor, generic.TemplateView):
         del args, kwargs
         form = self.form_class(request.POST, workflow_user=request.user)
         if request.method == 'POST' and form.is_valid():
-            if not form.has_changed():
-                return http.JsonResponse({'html_redirect': None})
-
-            return services.save_workflow_form(request, form)
-
+            return (
+                services.save_workflow_form(request, form)
+                if form.has_changed()
+                else http.JsonResponse({'html_redirect': None})
+            )
         return http.JsonResponse({
             'html_form': render_to_string(
                 self.template_name,
@@ -75,16 +75,14 @@ def index(request: http.HttpRequest) -> http.HttpResponse:
     remove_workflow_from_session(request)
 
     # Report if Celery is not running properly
-    if request.user.is_superuser:
-        # Verify that celery is running!
-        if not celery_is_up():
-            messages.error(
-                request,
-                _(
-                    'WARNING: Celery is not currently running. '
-                    + 'Please configure it correctly.',
-                ),
-            )
+    if request.user.is_superuser and not celery_is_up():
+        messages.error(
+            request,
+            _(
+                'WARNING: Celery is not currently running. '
+                + 'Please configure it correctly.',
+            ),
+        )
 
     return render(
         request,
@@ -121,11 +119,11 @@ def update(
         workflow_user=workflow.user)
 
     if request.method == 'POST' and form.is_valid():
-        if not form.has_changed():
-            return http.JsonResponse({'html_redirect': None})
-
-        return services.save_workflow_form(request, form)
-
+        return (
+            services.save_workflow_form(request, form)
+            if form.has_changed()
+            else http.JsonResponse({'html_redirect': None})
+        )
     return http.JsonResponse({
         'html_form': render_to_string(
             'workflow/includes/partial_workflow_update.html',

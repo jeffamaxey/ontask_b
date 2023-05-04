@@ -135,14 +135,12 @@ class EmailCCBCCFormBase(ontask_forms.FormWithPayload):
                     email.strip()
                     for email in form_data['bcc_email'].split() if email]))])
 
-        incorrect_email = get_incorrect_email(form_data['cc_email'].split())
-        if incorrect_email:
+        if incorrect_email := get_incorrect_email(form_data['cc_email'].split()):
             self.add_error(
                 'cc_email',
                 _('Incorrect email value "{0}".').format(incorrect_email))
 
-        incorrect_email = get_incorrect_email(form_data['bcc_email'].split())
-        if incorrect_email:
+        if incorrect_email := get_incorrect_email(form_data['bcc_email'].split()):
             self.add_error(
                 'bcc_email',
                 _('Incorrect email value "{0}".').format(incorrect_email))
@@ -172,8 +170,7 @@ class ItemColumnConfirmFormBase(ontask_forms.FormWithPayload):
 
         self.fields['item_column'].queryset = self.columns
 
-        item_column_pk = self.get_payload_field('item_column')
-        if item_column_pk:
+        if item_column_pk := self.get_payload_field('item_column'):
             item_column = self.columns.get(pk=item_column_pk)
         else:
             # Try to guess if there is an "email" column
@@ -288,9 +285,9 @@ class EmailActionForm(
             column_data = sql.get_rows(
                 self.action.workflow.get_data_frame_table_name(),
                 column_names=[pcolumn.name])
-            incorrect_email = get_incorrect_email(
-                [iname[0] for iname in column_data])
-            if incorrect_email:
+            if incorrect_email := get_incorrect_email(
+                [iname[0] for iname in column_data]
+            ):
                 # column has incorrect email addresses
                 self.add_error(
                     'item_column',

@@ -143,7 +143,7 @@ class Column(NameAndDescription):
         if self.data_type == 'string':
             return 'Text'
 
-        if self.data_type == 'integer' or self.data_type == 'double':
+        if self.data_type in ['integer', 'double']:
             return 'Number'
 
         if self.data_type == 'datetime':
@@ -252,9 +252,8 @@ class Column(NameAndDescription):
             'categories': self.categories,
             'active_from': self.active_from,
             'active_to': self.active_to,
-            'workflow_id': self.workflow.id}
-
-        payload.update(kwargs)
+            'workflow_id': self.workflow.id,
+        } | kwargs
         return Log.objects.register(
             user,
             operation_type,

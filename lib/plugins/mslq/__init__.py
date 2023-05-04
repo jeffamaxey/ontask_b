@@ -42,11 +42,13 @@ def mslq_encode(answers, num):
         answers[idx] = num + 1 - answers[idx]
 
     # Calculate and return the five values
-    return (1.0 * sum([answers[i - 1] for i in ival_idx]) / len(ival_idx),
-            1.0 * sum([answers[i - 1] for i in seff_idx]) / len(seff_idx),
-            1.0 * sum([answers[i - 1] for i in tanx_idx]) / len(tanx_idx),
-            1.0 * sum([answers[i - 1] for i in csus_idx]) / len(csus_idx),
-            1.0 * sum([answers[i - 1] for i in srel_idx]) / len(srel_idx))
+    return (
+        1.0 * sum(answers[i - 1] for i in ival_idx) / len(ival_idx),
+        1.0 * sum(answers[i - 1] for i in seff_idx) / len(seff_idx),
+        1.0 * sum(answers[i - 1] for i in tanx_idx) / len(tanx_idx),
+        1.0 * sum(answers[i - 1] for i in csus_idx) / len(csus_idx),
+        1.0 * sum(answers[i - 1] for i in srel_idx) / len(srel_idx),
+    )
 
 
 class MSLQEvaluate(OnTaskTransformation):

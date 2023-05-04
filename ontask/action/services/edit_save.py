@@ -29,31 +29,29 @@ def save_action_form(
     :param workflow: workflow being processed.
     :return: JSON response
     """
-    if request.method == 'POST' and form.is_valid():
+    if request.method != 'POST' or not form.is_valid():
+        return http.JsonResponse({
+            'html_form': render_to_string(
+                template_name,
+                {'form': form},
+                request=request),
+        })
+    if not form.has_changed():
+        return http.JsonResponse({'html_redirect': None})
 
-        if not form.has_changed():
-            return http.JsonResponse({'html_redirect': None})
+    # Fill in the fields of the action (without saving to DB)_
+    action_item = form.save(commit=False)
 
-        # Fill in the fields of the action (without saving to DB)_
-        action_item = form.save(commit=False)
+    if action_item.pk is None:
+        # Action is New. Update certain vars
+        action_item.workflow = workflow
+        action_item.save()
+        log_type = models.Log.ACTION_CREATE
+        return_url = reverse('action:edit', kwargs={'pk': action_item.id})
+    else:
+        action_item.save()
+        log_type = models.Log.ACTION_UPDATE
+        return_url = reverse('action:index')
 
-        if action_item.pk is None:
-            # Action is New. Update certain vars
-            action_item.workflow = workflow
-            action_item.save()
-            log_type = models.Log.ACTION_CREATE
-            return_url = reverse('action:edit', kwargs={'pk': action_item.id})
-        else:
-            action_item.save()
-            log_type = models.Log.ACTION_UPDATE
-            return_url = reverse('action:index')
-
-        action_item.log(request.user, log_type)
-        return http.JsonResponse({'html_redirect': return_url})
-
-    return http.JsonResponse({
-        'html_form': render_to_string(
-            template_name,
-            {'form': form},
-            request=request),
-    })
+    action_item.log(request.user, log_type)
+    return http.JsonResponse({'html_redirect': return_url})

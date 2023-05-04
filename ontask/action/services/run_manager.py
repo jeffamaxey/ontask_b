@@ -118,8 +118,8 @@ class ActionRunManager:
         # Get the information from the payload
         if not action:
             action = workflow.actions.filter(pk=payload['action_id']).first()
-            if not action:
-                return redirect('home')
+        if not action:
+            return redirect('home')
 
         log_item = self._create_log_event(
             request.user,

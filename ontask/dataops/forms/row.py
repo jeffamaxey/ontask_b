@@ -25,12 +25,8 @@ class RowForm(forms.Form):
             col_val = self.initial_values.get(column.name)
             field = column_to_field(column, col_val)
 
-            if column.is_key:
-                if col_val:
-                    field.widget.attrs['readonly'] = 'readonly'
-                else:
-                    field.required = True
-            elif column.data_type == 'integer':
+            if column.is_key and col_val:
+                field.widget.attrs['readonly'] = 'readonly'
+            elif column.is_key or column.data_type == 'integer':
                 field.required = True
-
-            self.fields[ONTASK_UPLOAD_FIELD_PREFIX + '%s' % idx] = field
+            self.fields[f'{ONTASK_UPLOAD_FIELD_PREFIX}{idx}'] = field

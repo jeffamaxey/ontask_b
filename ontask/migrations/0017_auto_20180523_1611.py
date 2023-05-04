@@ -5,6 +5,8 @@ from __future__ import unicode_literals
 from django.db import migrations
 
 
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -17,7 +19,6 @@ class Migration(migrations.Migration):
             options={'ordering': ('created',)},
         ),
         migrations.AlterUniqueTogether(
-            name='condition',
-            unique_together=set([('action', 'name', 'is_filter')]),
+            name='condition', unique_together={('action', 'name', 'is_filter')}
         ),
     ]

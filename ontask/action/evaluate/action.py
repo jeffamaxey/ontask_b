@@ -203,23 +203,21 @@ def get_row_values(
     # Step 1: Get the row of data from the DB
     filter_formula = action.get_filter_formula()
 
-    # If row_idx is an integer, get the data by index, otherwise, by key
-    if isinstance(row_idx, int):
-        row = pandas.get_table_row_by_index(
+    return (
+        pandas.get_table_row_by_index(
             action.workflow,
             filter_formula,
             row_idx,
         )
-    else:
-
-        row = sql.get_row(
+        if isinstance(row_idx, int)
+        else sql.get_row(
             action.workflow.get_data_frame_table_name(),
             row_idx[0],
             row_idx[1],
             column_names=action.workflow.get_column_names(),
             filter_formula=filter_formula,
         )
-    return row
+    )
 
 
 def evaluate_row_action_out(

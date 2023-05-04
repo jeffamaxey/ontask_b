@@ -399,8 +399,7 @@ class ActionActionInCreate(tests.OnTaskLiveTestCase):
         # Enter data for the remaining user
         self.selenium.find_element_by_link_text("student02@bogus.com").click()
         # Mark as registered
-        self.selenium.find_element_by_id(
-            'id_' + ONTASK_UPLOAD_FIELD_PREFIX + '1').click()
+        self.selenium.find_element_by_id(f'id_{ONTASK_UPLOAD_FIELD_PREFIX}1').click()
 
         # Submit form
         self.selenium.find_element_by_xpath(
@@ -730,8 +729,10 @@ class ActionSendReportActionCreate(tests.OnTaskLiveTestCase):
         self.assertIn('student03@bogus.com', preview_body)
         self.assertEqual(
             self.selenium.find_element_by_xpath(
-                '//*[@id="preview-variables"]').text,
-            'Attachments: ' + view.name)
+                '//*[@id="preview-variables"]'
+            ).text,
+            f'Attachments: {view.name}',
+        )
 
         # Close the preview
         self.cancel_modal()
@@ -771,7 +772,7 @@ class ActionSendReportActionCreate(tests.OnTaskLiveTestCase):
         attachment = msg.attachments[0]
         assert attachment.get_content_type() == 'text/csv'
         assert attachment.get_content_disposition() == 'attachment'
-        assert attachment.get_filename() == view.name + '.csv'
+        assert attachment.get_filename() == f'{view.name}.csv'
 
         # End of session
         self.logout()
@@ -969,7 +970,7 @@ class ActionCreateRubric(tests.OnTaskLiveTestCase):
         self.wait_for_modal_open()
         elem = self.selenium.find_element_by_id('id_levels_of_attainment')
         elem.clear()
-        elem.send_keys(', '.join([loa + '2' for loa in loas]))
+        elem.send_keys(', '.join([f'{loa}2' for loa in loas]))
         self.selenium.find_element_by_xpath(
             '//div[@id="modal-item"]//button[@type="submit"]'
         ).click()
@@ -994,4 +995,4 @@ class ActionCreateRubric(tests.OnTaskLiveTestCase):
                 'FEEDBACK {0}'.format(idx))
 
         column.refresh_from_db()
-        self.assertEqual(column.categories, [loa + '2' for loa in loas])
+        self.assertEqual(column.categories, [f'{loa}2' for loa in loas])

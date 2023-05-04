@@ -32,12 +32,13 @@ class WorkflowForm(forms.ModelForm):
             )
             return form_data
 
-        # Check if the name already exists
-        name_exists = models.Workflow.objects.filter(
-            user=self.user,
-            name=self.cleaned_data['name']
-        ).exclude(id=self.instance.id).exists()
-        if name_exists:
+        if (
+            name_exists := models.Workflow.objects.filter(
+                user=self.user, name=self.cleaned_data['name']
+            )
+            .exclude(id=self.instance.id)
+            .exists()
+        ):
             self.add_error(
                 'name',
                 _('A workflow with this name already exists'),
@@ -85,11 +86,9 @@ class WorkflowImportForm(forms.Form):
                 _('Incorrect form request (it is not multipart)'),
             )
 
-        # Check if the name already exists
-        name_exists = models.Workflow.objects.filter(
-            user=self.user,
-            name=self.cleaned_data['name']).exists()
-        if name_exists:
+        if name_exists := models.Workflow.objects.filter(
+            user=self.user, name=self.cleaned_data['name']
+        ).exists():
             self.add_error(
                 'name',
                 _('A workflow with this name already exists'),
@@ -123,12 +122,7 @@ class WorkflowExportRequestForm(forms.Form):
         # Create as many fields as the given columns
         for idx, action in enumerate(self.actions):
             # Include the labels if requested
-            if self.put_labels:
-                label = action.name
-            else:
-                label = ''
-
-            self.fields[self.field_prefix + '%s' % idx] = forms.BooleanField(
-                label=label,
-                label_suffix='',
-                required=False)
+            label = action.name if self.put_labels else ''
+            self.fields[f'{self.field_prefix}{idx}'] = forms.BooleanField(
+                label=label, label_suffix='', required=False
+            )

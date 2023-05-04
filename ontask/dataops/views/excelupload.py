@@ -50,8 +50,7 @@ def excelupload_start(
         msg = _('Excel upload form is not multiform')
         context = {'message': msg}
 
-        meta = request.META.get('HTTP_REFERER')
-        if meta:
+        if meta := request.META.get('HTTP_REFERER'):
             context['meta'] = meta
         return render(request, 'critical_error.html', context=context)
 

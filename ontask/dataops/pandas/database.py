@@ -74,10 +74,11 @@ def create_db_engine(
 
     return sqlalchemy.create_engine(
         database_url,
-        client_encoding=str('utf8'),
-        encoding=str('utf8'),
+        client_encoding='utf8',
+        encoding='utf8',
         echo=False,
-        paramstyle='format')
+        paramstyle='format',
+    )
 
 
 def destroy_db_engine(db_engine=None):
@@ -88,9 +89,8 @@ def destroy_db_engine(db_engine=None):
     """
     if db_engine:
         db_engine.dispose()
-    else:
-        if getattr(OnTaskSharedState, 'engine', None):
-            OnTaskSharedState.engine.dispose()
+    elif getattr(OnTaskSharedState, 'engine', None):
+        OnTaskSharedState.engine.dispose()
 
 
 def load_table(

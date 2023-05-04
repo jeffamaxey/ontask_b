@@ -25,7 +25,7 @@ class ScheduleApiCreate(tests.OnTaskApiTestCase):
         super().setUp()
         # Get the token for authentication and set credentials in client
         token = Token.objects.get(user__email='instructor01@bogus.com')
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
 
     def test_action_from_other_user(self):
         action_name = 'email action'
@@ -419,7 +419,7 @@ class ScheduleApiCreate(tests.OnTaskApiTestCase):
         response = self.client.put(
             reverse('scheduler:api_rud_email', kwargs={'pk': sch_item.id}),
             {
-                'name': self.s_name + '2',
+                'name': f'{self.s_name}2',
                 'description_text': self.s_desc,
                 'operation_type': 'action_run_personalized_email',
                 'workflow': action.workflow.id,
@@ -431,15 +431,17 @@ class ScheduleApiCreate(tests.OnTaskApiTestCase):
                     'cc_email': '',
                     'bcc_email': '',
                     'track_read': False,
-                    'send_confirmation': False}},
-            format='json'
+                    'send_confirmation': False,
+                },
+            },
+            format='json',
         )
 
         # Element has been scheduled
         self.assertTrue(status.is_success(response.status_code))
 
         sch_item = models.ScheduledOperation.objects.get(action=action)
-        self.assertEqual(sch_item.name, self.s_name + '2')
+        self.assertEqual(sch_item.name, f'{self.s_name}2')
 
         # Delete the element
         response = self.client.delete(
@@ -492,7 +494,7 @@ class ScheduleApiCreate(tests.OnTaskApiTestCase):
         response = self.client.put(
             reverse('scheduler:api_rud_json', kwargs={'pk': sch_item.id}),
             {
-                'name': self.s_name + '2',
+                'name': f'{self.s_name}2',
                 'description_text': self.s_desc,
                 'operation_type': 'action_run_personalized_json',
                 'workflow': action.workflow.id,
@@ -505,14 +507,14 @@ class ScheduleApiCreate(tests.OnTaskApiTestCase):
                     'field2': 'value2',
                 },
             },
-            format='json'
+            format='json',
         )
 
         # Element has been scheduled
         self.assertTrue(status.is_success(response.status_code))
 
         sch_item = models.ScheduledOperation.objects.get(action=action)
-        self.assertEqual(sch_item.name, self.s_name + '2')
+        self.assertEqual(sch_item.name, f'{self.s_name}2')
 
         # Delete the element
         response = self.client.delete(

@@ -149,17 +149,19 @@ def ot_insert_report(context, *args) -> str:
     """Insert in the text a column list."""
     action = context[ACTION_CONTEXT_VAR]
     real_args = [evaluate.RTR_ITEM(argitem) for argitem in args]
-    all_column_values = []
-    for column_name in real_args:
-        all_column_values.append([
-            str(citem[0]) for citem in sql.get_rows(
+    all_column_values = [
+        [
+            str(citem[0])
+            for citem in sql.get_rows(
                 action.workflow.get_data_frame_table_name(),
                 column_names=[evaluate.RTR_ITEM(column_name)],
-                filter_formula=action.get_filter_formula())])
-
+                filter_formula=action.get_filter_formula(),
+            )
+        ]
+        for column_name in real_args
+    ]
     if action.action_type == models.Action.JSON_REPORT:
-        return mark_safe(json.dumps({
-            cname: cval for cname, cval in zip(real_args, all_column_values)}))
+        return mark_safe(json.dumps(dict(zip(real_args, all_column_values))))
 
     # return the content rendered as a table
     return render_to_string(

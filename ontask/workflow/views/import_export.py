@@ -59,13 +59,13 @@ def export_ask(
         put_labels=True)
 
     if request.method == 'POST' and form.is_valid():
-        to_include = []
-        for idx, a_id in enumerate(
-            workflow.actions.values_list('id', flat=True),
-        ):
-            if form.cleaned_data['select_%s' % idx]:
-                to_include.append(str(a_id))
-
+        to_include = [
+            str(a_id)
+            for idx, a_id in enumerate(
+                workflow.actions.values_list('id', flat=True),
+            )
+            if form.cleaned_data[f'select_{idx}']
+        ]
         if not to_include and only_action_list:
             return redirect(reverse('action:index'))
 

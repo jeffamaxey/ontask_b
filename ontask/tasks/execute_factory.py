@@ -43,10 +43,10 @@ class ExecuteFactory:
         :param kwargs: Parameters passed to execution
         :return: Whatever is returned by the execution
         """
-        producer_obj = self._producers.get(operation_type)
-        if not producer_obj:
+        if producer_obj := self._producers.get(operation_type):
+            return producer_obj.execute_operation(**kwargs)
+        else:
             raise ValueError(operation_type)
-        return producer_obj.execute_operation(**kwargs)
 
 
 task_execute_factory = ExecuteFactory()

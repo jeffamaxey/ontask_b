@@ -37,7 +37,7 @@ class UploadBasic(forms.Form):
         """Store the workflow for further processing."""
         self.data_frame: Optional[pd.DataFrame] = None
         self.frame_info = None
-        self.workflow = kwargs.pop(str('workflow'), None)
+        self.workflow = kwargs.pop('workflow', None)
         super().__init__(*args, **kwargs)
 
     def validate_data_frame(self):

@@ -67,9 +67,7 @@ class ColumnBasicForm(forms.ModelForm):
 
         # Column name must be a legal variable name
         if 'name' in self.changed_data:
-            # Name is legal
-            msg = is_legal_name(form_data['name'])
-            if msg:
+            if msg := is_legal_name(form_data['name']):
                 self.add_error('name', msg)
                 return form_data
 
@@ -90,18 +88,14 @@ class ColumnBasicForm(forms.ModelForm):
                     form_data['raw_categories'])
                 if (
                     self.allow_interval_as_initial
-                    and (
-                        form_data['data_type'] == 'double'
-                        or form_data['data_type'] == 'integer')
+                    and form_data['data_type'] in ['double', 'integer']
                     and match
                 ):
                     # If it is a number column, and there is an interval string
-                    from_val = int(match.group('from'))
-                    to_val = int(match.group('to'))
+                    from_val = int(match['from'])
+                    to_val = int(match['to'])
                     if from_val > to_val:
-                        tmp = from_val
-                        from_val = to_val
-                        to_val = tmp
+                        from_val, to_val = to_val, from_val
                     category_values = [
                         str(val) for val in range(from_val, to_val + 1)]
                 else:
@@ -130,8 +124,8 @@ class ColumnBasicForm(forms.ModelForm):
 
                 # Condition 3: The values in the dataframe column must be in
                 # these categories (only if the column is being edited, though
-                if self.instance.name and not all(
-                    vval in valid_values
+                if self.instance.name and any(
+                    vval not in valid_values
                     for vval in self.data_frame[self.instance.name]
                     if vval and not pd.isnull(vval)
                 ):
@@ -199,9 +193,7 @@ class ColumnAddForm(ColumnBasicForm):
         """Validate the initial value."""
         form_data = super().clean()
 
-        # Try to convert the initial value ot the right type
-        initial_value = form_data['initial_value']
-        if initial_value:
+        if initial_value := form_data['initial_value']:
             # See if the given value is allowed for the column data type
             try:
                 self.initial_valid_value = models.Column.validate_column_value(
@@ -532,5 +524,5 @@ class ColumnSelectForm(forms.Form):
 
         # Populate the column choices
         self.fields['columns'].choices = [
-            (col.name, col.name) for idx, col in enumerate(self.wf_columns)
+            (col.name, col.name) for col in self.wf_columns
         ]

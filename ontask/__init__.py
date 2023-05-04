@@ -216,4 +216,4 @@ def create_new_name(old_name: str, obj_manager) -> str:
 
 def get_country_code(language_code: str) -> str:
     """Extract the country code from the language code."""
-    return language_code[0:language_code.find('-')]
+    return language_code[:language_code.find('-')]

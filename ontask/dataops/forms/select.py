@@ -65,23 +65,19 @@ class SelectColumnUploadForm(forms.Form):
         # Create as many fields as the given columns
         col_info = zip(self.column_names, self.columns_to_upload)
         for idx, (colname, upload) in enumerate(col_info):
-            self.fields['upload_%s' % idx] = forms.BooleanField(
-                initial=upload,
-                label='',
-                required=False)
+            self.fields[f'upload_{idx}'] = forms.BooleanField(
+                initial=upload, label='', required=False
+            )
 
-            self.fields['new_name_%s' % idx] = forms.CharField(
-                initial=colname,
-                label='',
-                strip=True,
-                required=False)
+            self.fields[f'new_name_{idx}'] = forms.CharField(
+                initial=colname, label='', strip=True, required=False
+            )
 
             # Field to confirm if the key columns are kept.
             if self.is_key[idx]:
-                self.fields['make_key_%s' % idx] = forms.BooleanField(
-                    initial=self.keep_key[idx],
-                    label='',
-                    required=False)
+                self.fields[f'make_key_{idx}'] = forms.BooleanField(
+                    initial=self.keep_key[idx], label='', required=False
+                )
 
     def clean(self) -> Dict:
         """Check that at least a key column has been selected."""
@@ -89,12 +85,12 @@ class SelectColumnUploadForm(forms.Form):
 
         field_info = zip(
             [
-                cleaned_data.get('upload_%s' % idx)
+                cleaned_data.get(f'upload_{idx}')
                 for idx in range(len(self.column_names))
             ],
             self.is_key,
             [
-                cleaned_data.get('make_key_%s' % idx)
+                cleaned_data.get(f'make_key_{idx}')
                 for idx in range(len(self.column_names))
             ],
         )

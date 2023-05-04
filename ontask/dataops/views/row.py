@@ -35,8 +35,9 @@ def row_create(
 
     if request.method == 'POST' and form.is_valid():
         row_values = [
-            form.cleaned_data[(ONTASK_UPLOAD_FIELD_PREFIX + '%s') % idx]
-            for idx in range(workflow.columns.count())]
+            form.cleaned_data[f'{ONTASK_UPLOAD_FIELD_PREFIX}%s' % idx]
+            for idx in range(workflow.columns.count())
+        ]
         try:
             services.create_row(workflow, row_values)
         except Exception as exc:
@@ -103,8 +104,9 @@ def row_update(
 
         try:
             row_values = [
-                form.cleaned_data[(ONTASK_UPLOAD_FIELD_PREFIX + '%s') % idx]
-                for idx in range(workflow.columns.count())]
+                form.cleaned_data[f'{ONTASK_UPLOAD_FIELD_PREFIX}%s' % idx]
+                for idx in range(workflow.columns.count())
+            ]
             services.update_row_values(
                 workflow,
                 update_key,

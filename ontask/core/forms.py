@@ -47,20 +47,19 @@ class RestrictedFileField(forms.FileField):
         """Verify that type content and size are correct."""
         form_data = super().clean(*args, **kwargs)
         try:
-            if form_data.content_type in self.content_types:
-                if form_data.size > self.max_upload_size:
-                    raise forms.ValidationError(
-                        _(
-                            'File size must be under %(max)s. Current file '
-                            + 'size is %(current)s.').format(
-                            filesizeformat(self.max_upload_size),
-                            filesizeformat(form_data.size),
-                        ),
-                    )
-            else:
+            if form_data.content_type not in self.content_types:
                 raise forms.ValidationError(_(
                     'File type ({0}) is not supported.').format(
                     form_data.content_type))
+            if form_data.size > self.max_upload_size:
+                raise forms.ValidationError(
+                    _(
+                        'File size must be under %(max)s. Current file '
+                        + 'size is %(current)s.').format(
+                        filesizeformat(self.max_upload_size),
+                        filesizeformat(form_data.size),
+                    ),
+                )
         except AttributeError:
             return form_data
 

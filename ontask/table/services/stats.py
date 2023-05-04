@@ -78,7 +78,7 @@ def _get_column_visualisations(
         context = {}
 
     # Create V1 if data type is integer or real
-    if column.data_type == 'integer' or column.data_type == 'double':
+    if column.data_type in ['integer', 'double']:
         # Propagate the id if given
         if viz_id:
             context['id'] = viz_id + '_boxplot'
@@ -180,7 +180,7 @@ def get_table_visualization_items(
         visualizations.append(
             '<hr/><h4 class="text-center">' + column.name + '</h4>')
         # If all values are empty, no need to proceed
-        if all(not col_data for col_data in df[column.name]):
+        if not any(df[column.name]):
             visualizations.append(
                 '<p>' + _('No values in this column') + '</p>')
             continue

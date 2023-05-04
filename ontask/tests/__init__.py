@@ -70,10 +70,7 @@ class ElementHasFullOpacity:
 
     def __call__(self, driver):
         element = driver.find_element(*self.locator)
-        if element.value_of_css_property('opacity') == '1':
-            return element
-        else:
-            return False
+        return element if element.value_of_css_property('opacity') == '1' else False
 
 
 class OnTaskBasicTestCase(TransactionTestCase):
@@ -355,7 +352,7 @@ class OnTaskLiveTestCase(OnTaskBasicTestCase, LiveServerTestCase):
         super().tearDownClass()
 
     def open(self, url):
-        self.selenium.get('%s%s' % (self.live_server_url, url))
+        self.selenium.get(f'{self.live_server_url}{url}')
 
     def login(self, uemail):
         self.open(reverse('accounts:login'))
@@ -628,8 +625,7 @@ class OnTaskLiveTestCase(OnTaskBasicTestCase, LiveServerTestCase):
         WebDriverWait(self.selenium, 10).until_not(
             EC.visibility_of_element_located((By.ID, 'div-spinner'))
         )
-        element = self.selenium.find_element_by_id('table-data')
-        if element:
+        if element := self.selenium.find_element_by_id('table-data'):
             # The table is present!
             self.wait_for_datatable('table-data_previous')
 
@@ -669,8 +665,7 @@ class OnTaskLiveTestCase(OnTaskBasicTestCase, LiveServerTestCase):
         WebDriverWait(self.selenium, 10).until_not(
             EC.visibility_of_element_located((By.ID, 'div-spinner'))
         )
-        element = self.selenium.find_element_by_id('column-table')
-        if element:
+        if element := self.selenium.find_element_by_id('column-table'):
             # The table is present!
             self.wait_for_datatable('column-table_previous')
 
@@ -702,9 +697,7 @@ class OnTaskLiveTestCase(OnTaskBasicTestCase, LiveServerTestCase):
                  'View logs'))
         ))
         self.selenium.find_element_by_id('ontask-base-logs').click()
-        # Wait for ajax table to refresh
-        element = self.selenium.find_element_by_id('log-table')
-        if element:
+        if element := self.selenium.find_element_by_id('log-table'):
             # Log table is present!
             self.wait_for_datatable('log-table_previous')
         self.assertIn('Logs', self.selenium.page_source)
@@ -974,13 +967,12 @@ class OnTaskLiveTestCase(OnTaskBasicTestCase, LiveServerTestCase):
 
     def delete_column(self, col_name):
         xpath_txt = \
-            '//table[@id="column-table"]' \
-            '//tr/td[3][normalize-space() = "{0}"]/..'.format(
+                '//table[@id="column-table"]' \
+                '//tr/td[3][normalize-space() = "{0}"]/..'.format(
                 col_name
             )
         # Click in the Delete button
-        self.selenium.find_element_by_xpath(
-            xpath_txt + '/td[2]/div/button[2]').click()
+        self.selenium.find_element_by_xpath(f'{xpath_txt}/td[2]/div/button[2]').click()
         self.wait_for_modal_open()
 
         self.selenium.find_element_by_xpath(
@@ -1169,8 +1161,7 @@ class OnTaskLiveTestCase(OnTaskBasicTestCase, LiveServerTestCase):
             form_field.clear()
             form_field.send_keys(cdesc)
 
-        idx = 0
-        for rule_filter, rule_operator, rule_value in rule_tuples:
+        for idx, (rule_filter, rule_operator, rule_value) in enumerate(rule_tuples):
             # Set the FILTER
             form_field = self.selenium.find_elements_by_name(
                 'builder_rule_{0}_filter'.format(idx)
@@ -1238,8 +1229,6 @@ class OnTaskLiveTestCase(OnTaskBasicTestCase, LiveServerTestCase):
                             value_idx
                         )
                     ).click()
-            idx += 1
-
         # Save the condition
         self.selenium.find_element_by_xpath(
             '//div[@id="modal-item"]//button[@type="submit"]'
@@ -1453,7 +1442,7 @@ class OnTaskLiveTestCase(OnTaskBasicTestCase, LiveServerTestCase):
     def open_browse_preview(self, n=0, close=True):
         self.open_preview()
 
-        for x in range(n):
+        for _ in range(n):
             self.selenium.find_element_by_xpath(
                 '//div[@id="modal-item"]'
                 '//button[contains(@class, "js-action-preview-nxt")]'
@@ -1912,13 +1901,11 @@ class ScreenTests(OnTaskLiveTestCase):
         if not xpath:
             raise Exception('Incorrect invocation of _get_image')
 
-        img = Image.open(io.BytesIO(
-            self.selenium.find_element_by_xpath(
-                xpath
-            ).screenshot_as_png)
+        return Image.open(
+            io.BytesIO(
+                self.selenium.find_element_by_xpath(xpath).screenshot_as_png
+            )
         )
-
-        return img
 
     def element_ss(self, xpath, ss_filename):
         """

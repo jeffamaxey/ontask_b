@@ -121,9 +121,7 @@ class ToolProvider(LaunchParamsMixin, RequestValidatorMixin):
         # Disassemble original return URL and reassemble with our options added
         original = urlsplit(self.launch_presentation_return_url)
 
-        combined = messages.copy()
-        combined.update(dict(parse_qsl(original.query)))
-
+        combined = messages | parse_qsl(original.query)
         combined_query = urlencode(combined)
 
         return urlunsplit((

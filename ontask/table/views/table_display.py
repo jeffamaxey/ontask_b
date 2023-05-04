@@ -57,14 +57,15 @@ def display_ss(
     :return: AJAX response
     """
     # If there is not DF, go to workflow details.
-    if not workflow.has_table():
-        return http.JsonResponse({'error': _('There is no data in the table')})
-
-    return services.render_table_display_server_side(
-        request,
-        workflow,
-        workflow.columns.all(),
-        None,
+    return (
+        services.render_table_display_server_side(
+            request,
+            workflow,
+            workflow.columns.all(),
+            None,
+        )
+        if workflow.has_table()
+        else http.JsonResponse({'error': _('There is no data in the table')})
     )
 
 
